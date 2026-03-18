@@ -5,23 +5,18 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { supabase } from "@/lib/supabaseClient";
 
+import BookingModal from "@/components/vendor/BookingModal";
+import BlockDateModal from "@/components/vendor/BlockDateModal";
+
 export default function VendorBookings() {
 
   const [userId, setUserId] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
 
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [showBookingForm, setShowBookingForm] = useState(false);
-
-  const [form, setForm] = useState({
-    start_time: "",
-    end_time: "",
-    event_name: "",
-    location: "",
-    customer_name: "",
-    customer_email: "",
-    customer_phone: ""
-  });
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   useEffect(() => {
     init();
@@ -33,10 +28,12 @@ export default function VendorBookings() {
 
     if (!data.user) return;
 
-    setUserId(data.user.id);
+    const id = data.user.id;
 
-    fetchBookings(data.user.id);
+    setUserId(id);
 
+    fetchBookings(id);
+    fetchBlockedDates(id);
   }
 
   async function fetchBookings(vendorId) {
@@ -48,47 +45,30 @@ export default function VendorBookings() {
       .order("booking_date", { ascending: true });
 
     if (data) setBookings(data);
-
   }
 
-  function handleChange(e) {
+async function fetchBlockedDates(vendorId) {
 
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
+    const { data } = await supabase
+      .from("vendor_blocked_dates")
+      .select("blocked_date")
+      .eq("vendor_id", vendorId);
 
-  }
+    if (data) {
+      const formatted = data.map(
+        (d) => new Date(d.blocked_date).toLocaleDateString("en-CA")
+      );
 
-  async function createBooking() {
-
-    if (!selectedDate) {
-      alert("Please select a date");
-      return;
+      setBlockedDates(formatted);
     }
 
-    const { error } = await supabase
-      .from("vendor_bookings")
-      .insert({
-        vendor_id: userId,
-        booking_date: selectedDate,
-        ...form
-      });
-
-    if (error) {
-      console.error(error);
-      alert(error.message);
-      return;
-    }
-
-    resetForm();
-    fetchBookings(userId);
-
-  }
+}
 
   async function deleteBooking(id) {
 
-    const confirmDelete = confirm("Delete this booking?");
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this booking?\n\nThis action is irreversible."
+    );
 
     if (!confirmDelete) return;
 
@@ -98,24 +78,21 @@ export default function VendorBookings() {
       .eq("id", id);
 
     fetchBookings(userId);
-
   }
 
-  function resetForm() {
+  function getTileClass({ date }) {
 
-    setForm({
-      start_time: "",
-      end_time: "",
-      event_name: "",
-      location: "",
-      customer_name: "",
-      customer_email: "",
-      customer_phone: ""
-    });
+    const d = date.toLocaleDateString("en-CA");
 
-    setSelectedDate(null);
-    setShowBookingForm(false);
+    if (blockedDates.includes(d)) return "calendar-red";
 
+    const dayBookings = bookings.filter(
+      (b) => b.booking_date === d
+    );
+
+    if (dayBookings.length === 0) return "calendar-green";
+
+    return "calendar-yellow";
   }
 
   return (
@@ -125,6 +102,43 @@ export default function VendorBookings() {
       <h1 className="text-2xl font-semibold">
         Booking Management
       </h1>
+
+      {/* ACTION BUTTONS */}
+
+      <div className="flex gap-4">
+
+        <button
+          onClick={() => setShowBookingModal(true)}
+          className="bg-[#7A1820] text-white px-5 py-2 rounded"
+        >
+          Schedule Event
+        </button>
+
+        <button
+          onClick={() => setShowBlockModal(true)}
+          className="bg-gray-800 text-white px-5 py-2 rounded"
+        >
+          Block Date
+        </button>
+
+        <button
+          onClick={() => setShowCalendar(!showCalendar)}
+          className="border px-5 py-2 rounded"
+        >
+          View Calendar
+        </button>
+
+      </div>
+
+      {/* CALENDAR */}
+
+      {showCalendar && (
+
+        <Calendar
+          tileClassName={getTileClass}
+        />
+
+      )}
 
       {/* BOOKINGS TABLE */}
 
@@ -146,14 +160,6 @@ export default function VendorBookings() {
           </thead>
 
           <tbody>
-
-            {bookings.length === 0 && (
-              <tr>
-                <td colSpan="6" className="text-center p-6 text-gray-400">
-                  No bookings yet
-                </td>
-              </tr>
-            )}
 
             {bookings.map((b) => (
 
@@ -198,119 +204,22 @@ export default function VendorBookings() {
 
       </div>
 
-      {/* CREATE BOOKING BUTTON */}
-
-      {!showBookingForm && (
-
-        <button
-          onClick={() => setShowBookingForm(true)}
-          className="bg-[#7A1820] text-white px-5 py-2 rounded-md"
-        >
-          + Create Booking
-        </button>
-
+      {showBookingModal && (
+        <BookingModal
+          userId={userId}
+          onClose={() => setShowBookingModal(false)}
+          refresh={() => fetchBookings(userId)}
+        />
       )}
 
-      {/* BOOKING FORM */}
-
-      {showBookingForm && (
-
-        <div className="border p-6 rounded-lg space-y-6">
-
-          <div className="flex justify-between">
-
-            <h2 className="font-semibold text-lg">
-              Create Booking
-            </h2>
-
-            <button
-              onClick={resetForm}
-              className="text-gray-500 text-sm"
-            >
-              Cancel
-            </button>
-
-          </div>
-
-          <Calendar
-            onChange={(date) =>
-              setSelectedDate(date.toISOString().split("T")[0])
-            }
-          />
-
-          {selectedDate && (
-
-            <div className="space-y-4">
-
-              <p className="text-sm text-gray-500">
-                Selected Date: {selectedDate}
-              </p>
-
-              <input
-                type="time"
-                name="start_time"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <input
-                type="time"
-                name="end_time"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <input
-                name="event_name"
-                placeholder="Event Name"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <input
-                name="location"
-                placeholder="Location"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <input
-                name="customer_name"
-                placeholder="Customer Name"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <input
-                name="customer_email"
-                placeholder="Customer Email"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <input
-                name="customer_phone"
-                placeholder="Customer Phone"
-                onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
-
-              <button
-                onClick={createBooking}
-                className="bg-[#7A1820] text-white px-5 py-2 rounded"
-              >
-                Save Booking
-              </button>
-
-            </div>
-
-          )}
-
-        </div>
-
+      {showBlockModal && (
+        <BlockDateModal
+          userId={userId}
+          onClose={() => setShowBlockModal(false)}
+          refresh={() => fetchBlockedDates(userId)}
+        />
       )}
 
     </div>
-
   );
 }

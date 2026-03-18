@@ -150,7 +150,7 @@ if (validServices.length === 0) {
             <th className="border p-2">Group *</th>
             <th className="border p-2">Service *</th>
             <th className="border p-2">Price *</th>
-            <th className="border p-2">Duration</th>
+            <th className="border p-2">Duration (in mins)</th>
             <th className="border p-2">Inclusions</th>
             <th className="border p-2">Exclusions</th>
             <th className="border p-2"></th>

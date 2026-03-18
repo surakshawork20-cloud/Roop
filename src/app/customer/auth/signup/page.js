@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Loader from "@/components/Loader";
 
 export default function CustomerSignup(){
 
@@ -11,8 +12,11 @@ const router = useRouter();
 
 const [email,setEmail] = useState("");
 const [password,setPassword] = useState("");
+const [loading,setLoading] = useState(false);
 
 async function signup(){
+
+setLoading(true);
 
 const { data, error } = await supabase.auth.signUp({
 email,
@@ -22,12 +26,14 @@ password
 if(error){
 
 if(error.message.includes("already registered")){
+setLoading(false);
 alert("Account exists. Please login.");
 router.push("/customer/auth/login");
 return;
 }
 
 alert(error.message);
+setLoading(false);
 return;
 }
 
@@ -47,12 +53,14 @@ is_customer: true
 router.replace("/");
 
 }
-
 return(
 
-<div className="min-h-screen flex items-center justify-center bg-black">
+    <>
+    {loading && <Loader fullscreen />}
 
-<div className="w-[900px] h-[520px] bg-white rounded-xl shadow-xl flex">
+<div className="min-h-screen flex items-center justify-center bg-white">
+
+<div className="w-[900px] h-[520px] bg-[#F4EDE7] rounded-xl shadow-xl flex">
 
 {/* LEFT PANEL */}
 
@@ -65,11 +73,11 @@ width={170}
 height={80}
 />
 
-<h2 className="text-3xl mt-6 font-semibold">
+<h2 className="text-3xl-[#F4EDE7] mt-6 font-semibold">
 Join ROOP
 </h2>
 
-<p className="text-sm mt-3 text-center max-w-xs">
+<p className="text-sm-[#F4EDE7] mt-3 text-center max-w-xs">
 Discover and book amazing makeup artists.
 </p>
 
@@ -110,7 +118,8 @@ className="border p-3 w-full rounded mb-6"
 
 <button
 onClick={signup}
-className="bg-[#691926] text-white w-full py-3 rounded"
+disabled={loading}
+className="bg-[#691926] text-white w-full py-3 rounded disabled:opacity-60"
 >
 Create Account
 </button>
@@ -123,6 +132,7 @@ Create Account
 
 </div>
 
+</>
 );
 
 }

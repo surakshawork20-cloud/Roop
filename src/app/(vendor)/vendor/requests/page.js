@@ -2,171 +2,230 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import AcceptBookingModal from "@/components/vendor/AcceptBookingModal";
 
-export default function VendorBookingsPage(){
 
-const [bookings,setBookings] = useState([]);
-const [loading,setLoading] = useState(true);
+export default function VendorBookingsPage() {
 
-/* --------------------------
-FETCH BOOKINGS
--------------------------- */
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
-async function fetchBookings(){
+  /* --------------------------
+  FETCH BOOKINGS
+  -------------------------- */
 
-const {data:userData} = await supabase.auth.getUser();
-const vendor = userData.user;
+  async function fetchBookings() {
 
-const {data,error} = await supabase
-.from("booking_requests")
-.select(`
-id,
-status,
-customer_id,
-vendor_id,
-customer_events (
-event_name,
-event_date,
-start_time,
-end_time,
-location,
-phone,
-name
-)
-`)
-.eq("vendor_id",vendor.id)
-.order("created_at",{ascending:false});
+    try {
 
-if(error){
-console.error(error);
-return;
-}
+      const { data: userData } = await supabase.auth.getUser();
+      const vendor = userData?.user;
 
-setBookings(data);
-setLoading(false);
+      if (!vendor) {
+        setLoading(false);
+        return;
+      }
 
-}
+      const { data, error } = await supabase
+        .from("booking_requests")
+        .select(`
+            id,
+            status,
+            customer_id,
+            vendor_id,
+            event_id,
+            customer_events!booking_requests_event_id_fkey (
+            event_name,
+            event_date,
+            event_time,
+            location,
+            phone,
+            name
+            )
+        `)
+        .eq("vendor_id", vendor.id)
+        .order("created_at", { ascending: false });
 
-/* --------------------------
-UPDATE STATUS
--------------------------- */
+      if (error) {
+        console.error("Booking fetch error:", error.message, error.details);
+        setLoading(false);
+        return;
+        }
 
-async function updateStatus(id,status){
+      setBookings(data || []);
+      setLoading(false);
 
-const {error} = await supabase
-.from("booking_requests")
-.update({status})
-.eq("id",id);
+    } catch (err) {
 
-if(error){
-console.error(error);
-alert("Error updating booking");
-return;
-}
+      console.error("Unexpected error:", err);
+      setLoading(false);
 
-fetchBookings();
+    }
+  }
 
-}
+  /* --------------------------
+  UPDATE STATUS
+  -------------------------- */
 
-useEffect(()=>{
-fetchBookings();
-},[]);
+  async function updateStatus(id, status) {
 
-/* --------------------------
-UI
--------------------------- */
+    const { error } = await supabase
+      .from("booking_requests")
+      .update({ status })
+      .eq("id", id);
 
-return(
+    if (error) {
+      console.error(error);
+      alert("Error updating booking");
+      return;
+    }
 
-<div className="p-8">
+    fetchBookings();
+  }
 
-<h1 className="text-2xl font-semibold mb-6">
-Booking Requests
-</h1>
+  /* --------------------------
+  INITIAL LOAD
+  -------------------------- */
 
-{loading && <p>Loading...</p>}
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
-{!loading && bookings.length === 0 && (
-<p>No booking requests yet.</p>
-)}
+  /* --------------------------
+  UI
+  -------------------------- */
 
-<div className="space-y-4">
+  return (
 
-{bookings.map((booking)=>(
+    <div className="p-8 max-w-5xl">
 
-<div
-key={booking.id}
-className="border rounded-lg p-5 flex justify-between items-center"
->
+      <h1 className="text-2xl font-semibold mb-6">
+        Booking Requests
+      </h1>
 
-<div className="space-y-1">
+      {loading && (
+        <p className="text-gray-500">
+          Loading booking requests...
+        </p>
+      )}
 
-<p className="font-medium">
-{booking.customer_events?.event_name}
-</p>
+      {!loading && bookings.length === 0 && (
+        <p className="text-gray-500">
+          No booking requests yet.
+        </p>
+      )}
 
-<p className="text-sm text-gray-500">
-{booking.customer_events?.event_date}
-</p>
+      <div className="space-y-4">
 
-<p className="text-sm text-gray-500">
-{booking.customer_events?.location}
-</p>
+        {bookings.map((booking) => {
 
-<p className="text-sm text-gray-500">
-Phone: {booking.customer_events?.phone}
-</p>
+          const event = booking.customer_events;
 
-</div>
+          return (
 
-{/* STATUS */}
+            <div
+              key={booking.id}
+              className="border rounded-lg p-5 flex justify-between items-center"
+            >
 
-<div className="flex items-center gap-3">
+              {/* EVENT INFO */}
 
-{booking.status === "pending" && (
+              <div className="space-y-1">
 
-<>
+                <p className="font-medium">
+                  {event?.event_name || "Unnamed Event"}
+                </p>
 
-<button
-onClick={()=>updateStatus(booking.id,"accepted")}
-className="bg-green-600 text-white px-4 py-2 rounded text-sm"
->
-Accept
-</button>
+                <p className="text-sm text-gray-500">
+                  Customer: {event?.name}
+                </p>
 
-<button
-onClick={()=>updateStatus(booking.id,"rejected")}
-className="bg-red-600 text-white px-4 py-2 rounded text-sm"
->
-Reject
-</button>
+                <p className="text-sm text-gray-500">
+                  {event?.event_date}
+                </p>
 
-</>
+                <p className="text-sm text-gray-500">
+                  {event?.event_time}
+                </p>
 
-)}
+                <p className="text-sm text-gray-500">
+                  {event?.location}
+                </p>
 
-{booking.status === "accepted" && (
-<span className="text-green-600 font-medium">
-Accepted
-</span>
-)}
+                <p className="text-sm text-gray-500">
+                  Phone: {event?.phone}
+                </p>
 
-{booking.status === "rejected" && (
-<span className="text-red-600 font-medium">
-Rejected
-</span>
-)}
+                {event?.email && (
+                <p className="text-sm text-gray-500">
+                    Email: {event.email}
+                </p>
+                )}
 
-</div>
+              </div>
 
-</div>
+              {/* STATUS ACTIONS */}
 
-))}
+              <div className="flex items-center gap-3">
 
-</div>
+                {booking.status === "pending" && (
 
-</div>
+                  <>
 
-);
+                    <button
+                      onClick={() => setSelectedBooking(booking)}
+                      className="bg-green-600 text-white px-4 py-2 rounded text-sm"
+                    >
+                      Accept
+                    </button>
+
+                    <button
+                      onClick={() => updateStatus(booking.id, "rejected")}
+                      className="bg-red-600 text-white px-4 py-2 rounded text-sm"
+                    >
+                      Reject
+                    </button>
+
+                  </>
+
+                )}
+
+                {booking.status === "accepted" && (
+                  <span className="text-green-600 font-medium">
+                    Accepted
+                  </span>
+                )}
+
+                {booking.status === "rejected" && (
+                  <span className="text-red-600 font-medium">
+                    Rejected
+                  </span>
+                )}
+
+              </div>
+
+            </div>
+
+          );
+
+        })}
+
+      </div>
+
+            {selectedBooking && (
+
+                <AcceptBookingModal
+                    booking={selectedBooking}
+                    event={selectedBooking.customer_events}
+                    refresh={fetchBookings}
+                    onClose={() => setSelectedBooking(null)}
+                />
+
+                )}
+
+    </div>
+
+  );
 
 }

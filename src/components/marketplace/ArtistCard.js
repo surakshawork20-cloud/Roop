@@ -1,10 +1,27 @@
+"use client";
+
 import Link from "next/link";
-import Image from "next/image";
+import { useState } from "react";
+import Loader from "@/components/Loader";
 export default function ArtistCard({ artist }) {
+
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = () => {
+    setLoading(true);
+  };
+
 
   return (
 
-    <Link href={`/artists/${artist.id}`}>
+        <>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+          <Loader />
+        </div>
+      )}
+
+    <Link href={`/artists/${artist.id}`} onClick={handleClick}>
 
       <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition">
 
@@ -33,6 +50,8 @@ export default function ArtistCard({ artist }) {
       </div>
 
     </Link>
+
+    </>
 
   );
 }

@@ -2,14 +2,22 @@ import Navbar from "@/components/marketplace/Navbar";
 import ArtistCard from "@/components/marketplace/ArtistCard";
 import { supabase } from "@/lib/supabaseClient";
 
-export default async function Home(){
+export default async function Home({ searchParams }){
 
-const { data:artists, error } = await supabase
-.from("vendor_basic_profile")
-.select("vendor_id,brand_name,city,area");
+  const params = await searchParams;
+  const search = params?.q?.trim() || "";
 
-console.log("Artists:", artists);
-console.log("Error:", error);
+    let query = supabase
+    .from("vendor_basic_profile")
+    .select("vendor_id, brand_name, city, area");
+
+  if (search) {
+    query = query.or(
+      `brand_name.ilike.%${search}%,city.ilike.%${search}%,area.ilike.%${search}%`
+    );
+  }
+
+  const { data: artists, error } = await query;
 
 
 const { data:photos } = await supabase
@@ -54,18 +62,33 @@ return(
 <h1 className="text-3xl font-semibold mb-8">
 Discover Artists
 </h1>
+{search && (
+  <p className="text-gray-500 mb-6">
+    Showing results for: <span className="font-semibold">{search}</span>
+  </p>
+)}
+{artistsWithImages.length === 0 ? (
 
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+  <p className="text-gray-500 text-lg">
+    No artists found
+  </p>
 
-{artistsWithImages.map((artist)=>(
-<ArtistCard key={artist.id} artist={artist}/>
-))}
+) : (
 
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+
+    {artistsWithImages.map((artist)=>(
+      <ArtistCard key={artist.id} artist={artist}/>
+    ))}
+
+  </div>
+
+)}
 </div>
 
 </div>
 
-</div>
+
 
 )
 

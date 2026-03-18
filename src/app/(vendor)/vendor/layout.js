@@ -44,28 +44,28 @@ export default function VendorLayout({ children }) {
   if (loading) return null;
 
   return (
-    <div className="flex h-screen bg-[#FAF7F5]">
+<div className="min-h-screen flex flex-col bg-[#FAF7F5]">
+
+    {/* FULL WIDTH NAVBAR */}
+    <div className="h-16 bg-[#691926]">
+      <Navbar />
+    </div>
+
+    {/* BELOW NAVBAR */}
+    <div className="flex flex-1">
 
       {/* Sidebar */}
-      <div className="w-64 bg-white">
+      <div className="w-64 bg-white border-r">
         <Sidebar />
       </div>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col">
-
-        {/* Navbar */}
-        <div className="h-16 bg-white flex items-center justify-end px-6">
-          <Navbar />
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 p-6 overflow-y-auto">
-          {children}
-        </div>
-
+      {/* Content */}
+      <div className="flex-1 p-6 overflow-y-auto">
+        {children}
       </div>
 
     </div>
+
+  </div>
   );
 }

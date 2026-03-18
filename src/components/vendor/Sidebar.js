@@ -18,12 +18,8 @@ export default function Sidebar() {
   }, [pathname]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col pt-6">
 
-      {/* Logo */}
-      <div className="p-6 text-xl font-bold text-[#7A1820]">
-        ROOP
-      </div>
 
       <nav className="px-4 space-y-2">
 
@@ -37,7 +33,7 @@ export default function Sidebar() {
 
         <button
           onClick={() => setProfileOpen(!profileOpen)}
-          className="w-full flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+          className="w-full text-sm flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
         >
           <span>Profile</span>
           <span className="text-xs">

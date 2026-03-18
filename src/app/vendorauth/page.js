@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Loader from "@/components/Loader";
 
 export default function VendorAuth() {
 
@@ -11,10 +12,13 @@ const router = useRouter();
 const [isSignup,setIsSignup] = useState(false);
 const [email,setEmail] = useState("");
 const [password,setPassword] = useState("");
+const [loading,setLoading] = useState(false);
 
 /* LOGIN */
 
 async function login(){
+
+setLoading(true);
 
 const { data, error } = await supabase.auth.signInWithPassword({
 email,
@@ -23,6 +27,7 @@ password
 
 if(error){
 alert(error.message);
+setLoading(false);
 return;
 }
 
@@ -48,6 +53,8 @@ router.replace("/vendor");
 
 async function signup(){
 
+setLoading(true);
+
 const { data, error } = await supabase.auth.signUp({
 email,
 password
@@ -56,6 +63,7 @@ password
 if(error){
 
 if(error.message.includes("already registered")){
+setLoading(false);
 alert("Account already exists. Please login.");
 setIsSignup(false);
 return;
@@ -91,13 +99,17 @@ router.replace("/vendor");
 
 return(
 
-<div className="min-h-screen flex items-center justify-center bg-black">
+    <>
 
-<div className="w-[900px] h-[520px] bg-white rounded-xl shadow-xl overflow-hidden flex">
+{loading && <Loader fullscreen />}
+
+<div className="min-h-screen flex items-center justify-center bg-white">
+
+<div className="w-[900px] h-[520px] bg-[#F4EDE7] rounded-xl shadow-xl overflow-hidden flex">
 
 {/* LEFT PANEL */}
 
-<div className="w-1/2 bg-[#691926] text-white flex flex-col items-center justify-center p-10">
+<div className="w-1/2 bg-[#691926] text-[#F4EDE7] flex flex-col items-center justify-center p-10">
 
 <Image
 src="/roop_logo.png"
@@ -106,12 +118,12 @@ width={170}
 height={80}
 />
 
-<h2 className="text-3xl mt-6 font-semibold">
+<h2 className="text-[#F4EDE7] text-3xl mt-6 font-semibold">
 Welcome Artist
 </h2>
 
-<p className="text-sm mt-3 text-center max-w-xs">
-Join ROOP and grow your makeup business.
+<p className="text-sm-[#F4EDE7] mt-3 text-center max-w-xs">
+If you are an Artist, get onboarded on ROOP to experience quicker bookings and faster growth
 </p>
 
 <button
@@ -126,7 +138,7 @@ className="mt-8 border border-white px-6 py-2 rounded hover:bg-white hover:text-
 
 {/* RIGHT PANEL */}
 
-<div className="w-1/2 flex items-center justify-center">
+<div className="bg-[#F4EDE7] w-1/2 flex items-center justify-center">
 
 <div className="w-[320px]">
 
@@ -151,9 +163,10 @@ className="border p-3 w-full rounded mb-6"
 
 <button
 onClick={isSignup ? signup : login}
-className="bg-[#691926] text-white w-full py-3 rounded hover:opacity-90 transition"
+disabled={loading}
+className="bg-[#691926] text-white w-full py-3 rounded hover:opacity-90 transition flex items-center justify-center"
 >
-{isSignup ? "Create Account" : "Login"}
+{loading ? <Loader /> : (isSignup ? "Create Account" : "Login")}
 </button>
 
 </div>
@@ -163,7 +176,7 @@ className="bg-[#691926] text-white w-full py-3 rounded hover:opacity-90 transiti
 </div>
 
 </div>
-
+</>
 );
 
 }

@@ -5,7 +5,19 @@
   --foreground: #171717;
 }
 
-/* Satoshi Fonts */
+.calendar-green {
+  background: #dcfce7 !important;
+}
+
+.calendar-yellow {
+  background: #fef9c3 !important;
+}
+
+.calendar-red {
+  background: #fecaca !important;
+}
+
+/* 
 
 @font-face {
   font-family: "Satoshi";
@@ -34,6 +46,7 @@
   font-weight: 700;
   font-style: normal;
 }
+  Satoshi Fonts */
 
 /* Theme */
 
@@ -54,7 +67,7 @@
 /* Default Font */
 
 body {
-  background: var(--background);
+  background-color: #F4EDE7;
   color: var(--foreground);
-  font-family: "Satoshi", sans-serif;
+  font-family: "Times New Roman", Georgia, serif;
 }

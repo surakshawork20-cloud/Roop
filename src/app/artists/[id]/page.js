@@ -1,268 +1,367 @@
 import Navbar from "@/components/marketplace/Navbar";
 import BookingModal from "@/components/marketplace/BookingModal";
+import Accordion from "@/components/ui/accordian";
 import { supabase } from "@/lib/supabaseClient";
+import PortfolioCarousel from "@/components/marketplace/PortfolioCarousel";
+import ArtistCalendar from "@/components/marketplace/ArtistCalendar";
 
 export default async function ArtistPage({ params }) {
 
 const { id: vendorId } = await params;
 
+
+const { data: bookings } = await supabase
+    .from("vendor_bookings")
+    .select("booking_date")
+    .eq("vendor_id", vendorId);
+
+const { data: blocked } = await supabase
+    .from("vendor_blocked_dates")
+    .select("blocked_date")
+    .eq("vendor_id", vendorId);
+
+
+const blockedDates =
+    blocked?.map(
+    (d) => new Date(d.blocked_date).toLocaleDateString("en-CA")
+    ) || [];
+
 /* --------------------------
 FETCH BASIC PROFILE
 -------------------------- */
 
-const { data:basic } = await supabase
-.from("vendor_basic_profile")
-.select("*")
-.eq("vendor_id", vendorId)
-.single();
+const { data: basic } = await supabase
+    .from("vendor_basic_profile")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .single();
 
 /* --------------------------
 FETCH PORTFOLIO PHOTOS
 -------------------------- */
 
-const { data:photos } = await supabase
-.from("vendor_portfolio_photos")
-.select("*")
-.eq("vendor_id", vendorId)
-.order("position");
+const { data: photos } = await supabase
+    .from("vendor_portfolio_photos")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .order("position");
 
 /* --------------------------
 FETCH SERVICES
 -------------------------- */
 
-const { data:services } = await supabase
-.from("vendor_services")
-.select("*")
-.eq("vendor_id", vendorId);
+const { data: servicesData } = await supabase
+    .from("vendor_services")
+    .select("*")
+    .eq("vendor_id", vendorId);
+
+   const services = servicesData || [];
 
 /* --------------------------
 FETCH SERVICE CAPABILITIES
 -------------------------- */
 
-const { data:capabilities } = await supabase
-.from("vendor_service_capabilities")
-.select("*")
-.eq("vendor_id", vendorId)
-.single();
+const { data: capabilities } = await supabase
+    .from("vendor_service_capabilities")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .single();
 
 /* --------------------------
 FETCH ADDITIONAL CHARGES
 -------------------------- */
 
-const { data:charges } = await supabase
-.from("vendor_additional_charges")
-.select("*")
-.eq("vendor_id", vendorId);
+const { data: chargesData } = await supabase
+    .from("vendor_additional_charges")
+    .select("*")
+    .eq("vendor_id", vendorId);
+
+   const charges = chargesData || [];
 
 /* --------------------------
 FETCH PAYMENT SETTINGS
 -------------------------- */
 
-const { data:payments } = await supabase
-.from("vendor_payment_settings")
-.select("*")
-.eq("vendor_id", vendorId)
-.single();
+const { data: payments } = await supabase
+    .from("vendor_payment_settings")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .single();
 
 /* --------------------------
 FETCH CANCELLATION POLICY
 -------------------------- */
 
-const { data:cancellation } = await supabase
-.from("vendor_cancellation_policy")
-.select("*")
-.eq("vendor_id", vendorId)
-.single();
+const { data: cancellation } = await supabase
+    .from("vendor_cancellation_policy")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .single();
+
+  /* --------------------------
+  FETCH WEEKLY AVAILABILITY
+  -------------------------- */
+
+
+const { data: availabilityData } = await supabase
+    .from("vendor_availability")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .order("day_of_week");
+
+  const availability = availabilityData || [];
 
 /* --------------------------
 CONVERT PHOTO PATHS TO URL
 -------------------------- */
 
 const images = photos?.map((p)=>{
-return supabase.storage
-.from("vendor-documents")
-.getPublicUrl(p.photo_url).data.publicUrl
-}) || [];
+    return supabase.storage
+    .from("vendor-documents")
+    .getPublicUrl(p.photo_url).data.publicUrl
+    }) || [];
 
 return(
 
-<div>
+        <div>
 
-<Navbar/>
+            <Navbar/>
 
-<div className="max-w-6xl mx-auto px-8 py-10 space-y-12">
+                <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
 
-{/* BOOK BUTTON */}
+            {/* BOOK BUTTON */}
 
-{/* BOOK BUTTON */}
 
-<BookingModal vendorId={vendorId} />
 
 
-{/* PORTFOLIO SLIDER */}
+                        <div className="flex justify-end items-center gap-4">
 
-<div className="overflow-x-auto flex gap-4">
+                                <ArtistCalendar
+                                    vendorId={vendorId}
+                                />
 
-{images.map((img,i)=>(
-<img
-key={i}
-src={img}
-className="h-80 rounded-lg object-cover"
-/>
-))}
+                                <BookingModal vendorId={vendorId} />
 
-</div>
+                            </div>
 
+            {/* PORTFOLIO */}
 
-{/* BASIC PROFILE */}
+                        <PortfolioCarousel images={images}/>
 
-<div>
+            {/* BASIC PROFILE */}
 
-<h2 className="text-2xl font-semibold mb-4">
-Artist Information
-</h2>
+                        <Accordion title="Artist Information">
 
-<div className="grid grid-cols-2 gap-4">
+                            {!basic ? (
 
-<p><strong>Brand:</strong> {basic?.brand_name}</p>
-<p><strong>Name:</strong> {basic?.full_name}</p>
-<p><strong>City:</strong> {basic?.city}</p>
-<p><strong>Area:</strong> {basic?.area}</p>
-<p><strong>Service Mode:</strong> {basic?.service_mode}</p>
-<p><strong>Travel Radius:</strong> {basic?.travel_radius} km</p>
-<p><strong>Languages:</strong> {basic?.languages}</p>
+                                <p className="text-gray-400">
+                                Artist information not available
+                                </p>
 
-</div>
+                                ) : (
 
-</div>
+                                <div className="grid grid-cols-2 gap-4">
 
+                                <p><strong>Brand:</strong> {basic.brand_name || "-"}</p>
+                                <p><strong>Name:</strong> {basic.full_name || "-"}</p>
+                                <p><strong>City:</strong> {basic.city || "-"}</p>
+                                <p><strong>Area:</strong> {basic.area || "-"}</p>
+                                <p><strong>Service Mode:</strong> {basic.service_mode || "-"}</p>
+                                <p><strong>Travel Radius:</strong> {basic.travel_radius || "-"} km</p>
+                                <p><strong>Languages:</strong> {basic.languages || "-"}</p>
 
-{/* SERVICES */}
+                                </div>
 
-<div>
+                            )}
 
-<h2 className="text-2xl font-semibold mb-4">
-Services
-</h2>
+                        </Accordion>
 
-<div className="space-y-4">
+            {/* SERVICES */}
 
-{services?.map((service)=>(
+                        <Accordion title="Services">
 
-<div
-key={service.id}
-className="border rounded-lg p-4 flex justify-between"
->
+                            {services?.length === 0 ? (
 
-<div>
+                                    <p className="text-gray-400">
+                                    No services listed yet
+                                    </p>
 
-<p className="font-medium">
-{service.service_name}
-</p>
+                                    ) : (
 
-<p className="text-sm text-gray-500">
-{service.service_group}
-</p>
+                                    <div className="grid md:grid-cols-2 gap-4">
 
-</div>
+                                    {services.map((service)=>(
 
-<div>
+                                    <div
+                                    key={service.id}
+                                    className="border rounded-lg p-5 flex justify-between items-center"
+                                    >
 
-<p className="font-semibold">
-₹ {service.price}
-</p>
+                                    <div>
 
-</div>
+                                    <p className="font-semibold text-lg">
+                                    {service.service_name}
+                                    </p>
 
-</div>
+                                    <p className="text-sm text-gray-500">
+                                    {service.service_group}
+                                    </p>
 
-))}
+                                    </div>
 
-</div>
+                                    <div className="text-lg font-bold">
+                                    ₹ {service.price}
+                                    </div>
 
-</div>
+                                    </div>
 
+                                    ))}
 
-{/* SERVICE CAPABILITIES */}
+                                    </div>
 
-{capabilities && (
+                            )}
 
-<div>
+                        </Accordion>
 
-<h2 className="text-2xl font-semibold mb-4">
-Professional Details
-</h2>
+            {/* PROFESSIONAL DETAILS */}
 
-<p>Experience: {capabilities.years_experience} years</p>
-<p>Expertise: {capabilities.expertise}</p>
-<p>Team: {capabilities.team_type}</p>
-<p>Max Bookings Per Day: {capabilities.max_bookings}</p>
+                        <Accordion title="Professional Details">
 
-</div>
+                            {!capabilities ? (
 
-)}
+                                <p className="text-gray-400">
+                                No professional details provided
+                                </p>
 
+                                ) : (
 
-{/* ADDITIONAL CHARGES */}
+                                <div className="space-y-2">
 
-{charges?.length > 0 && (
+                                <p>Experience: {capabilities.years_experience} years</p>
+                                <p>Expertise: {capabilities.expertise}</p>
+                                <p>Team: {capabilities.team_type}</p>
+                                <p>Max Bookings Per Day: {capabilities.max_bookings}</p>
 
-<div>
+                                </div>
 
-<h2 className="text-2xl font-semibold mb-4">
-Additional Charges
-</h2>
+                            )}
 
-{charges.map((c)=>(
-<p key={c.id}>
-{c.charge_type} — ₹{c.amount}
-</p>
-))}
+                        </Accordion>
 
-</div>
 
-)}
+                    {/* WEEKLY AVAILABILITY */}
 
+                    <Accordion title="Weekly Availability">
 
-{/* PAYMENT DETAILS */}
+                    {availability.length === 0 ? (
+                        <p className="text-gray-400">
+                        Availability not provided
+                        </p>
+                    ) : (
 
-{payments && (
+                        <div className="space-y-2">
 
-<div>
+                        {availability.map((day) => (
 
-<h2 className="text-2xl font-semibold mb-4">
-Payment Details
-</h2>
+                            <div
+                            key={day.id}
+                            className="flex justify-between border-b py-2"
+                            >
 
-<p>Payment Structure: {payments.payment_structure}</p>
-<p>Accepted Modes: {payments.payment_modes}</p>
+                            <span className="font-medium">
+                                {day.day_of_week}
+                            </span>
 
-</div>
+                            <span>
+                                {day.start_time} - {day.end_time}
+                            </span>
 
-)}
+                            </div>
 
+                        ))}
 
-{/* CANCELLATION POLICY */}
+                        </div>
 
-{cancellation && (
+                    )}
 
-<div>
+                    </Accordion>
 
-<h2 className="text-2xl font-semibold mb-4">
-Cancellation Policy
-</h2>
+            {/* ADDITIONAL CHARGES */}
 
-<p>7+ days: {cancellation.refund_7_days}% refund</p>
-<p>48 hrs - 7 days: {cancellation.refund_48_to_7}% refund</p>
-<p>Within 48 hrs: {cancellation.refund_48}% refund</p>
+                        <Accordion title="Additional Charges">
 
-</div>
+                            {charges?.length === 0 ? (
 
-)}
+                                <p className="text-gray-400">
+                                No additional charges
+                                </p>
 
-</div>
+                                ) : (
 
-</div>
+                                <div className="space-y-2">
+
+                                {charges.map((c)=>(
+                                <p key={c.id}>
+                                {c.charge_type} — ₹ {c.amount}
+                                </p>
+                                ))}
+
+                                </div>
+
+                            )}
+
+                        </Accordion>
+
+            {/* PAYMENT DETAILS */}
+
+                        <Accordion title="Payment Details">
+
+                            {!payments ? (
+
+                                <p className="text-gray-400">
+                                Payment information not available
+                                </p>
+
+                                ) : (
+
+                                <div className="space-y-2">
+
+                                <p>Payment Structure: {payments.payment_structure}</p>
+                                <p>Accepted Modes: {payments.payment_modes}</p>
+
+                                </div>
+
+                            )}
+
+                        </Accordion>
+
+            {/* CANCELLATION POLICY */}
+
+                        <Accordion title="Cancellation Policy">
+
+                            {!cancellation ? (
+
+                                <p className="text-gray-400">
+                                Cancellation policy not set
+                                </p>
+
+                                ) : (
+
+                                <div className="space-y-2">
+
+                                <p>7+ days: {cancellation.refund_7_days}% refund</p>
+                                <p>48 hrs - 7 days: {cancellation.refund_48_to_7}% refund</p>
+                                <p>Within 48 hrs: {cancellation.refund_48}% refund</p>
+
+                                </div>
+
+                            )}
+
+                        </Accordion>
+
+                </div>
+
+            </div>
 
 );
 
