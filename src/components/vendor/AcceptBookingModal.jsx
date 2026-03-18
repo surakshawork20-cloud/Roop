@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import Loader from "@/components/loader";
+import Loader from "@/components/Loader";
 
 export default function AcceptBookingModal({
   booking,
