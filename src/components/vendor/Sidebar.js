@@ -23,11 +23,13 @@ export default function Sidebar() {
 
       <nav className="px-4 space-y-2">
 
+        {/*
         <SidebarItem
           href="/vendor"
           label="Overview"
           pathname={pathname}
         />
+        */}
 
         {/* PROFILE DROPDOWN */}
 
@@ -44,11 +46,13 @@ export default function Sidebar() {
         {profileOpen && (
           <div className="ml-3 space-y-1">
 
+            {/*}
             <SidebarItem
               href="/vendor/profile"
               label="Overview"
               pathname={pathname}
             />
+            */}
 
             <SidebarItem
               href="/vendor/profile/basic"

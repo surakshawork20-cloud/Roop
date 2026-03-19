@@ -4,10 +4,12 @@ import Accordion from "@/components/ui/accordian";
 import { supabase } from "@/lib/supabaseClient";
 import PortfolioCarousel from "@/components/marketplace/PortfolioCarousel";
 import ArtistCalendar from "@/components/marketplace/ArtistCalendar";
+import { Briefcase } from "lucide-react";
 
 export default async function ArtistPage({ params }) {
 
 const { id: vendorId } = await params;
+console.log("Vendor ID:", vendorId);
 
 
 const { data: bookings } = await supabase
@@ -121,6 +123,12 @@ const images = photos?.map((p)=>{
     .getPublicUrl(p.photo_url).data.publicUrl
     }) || [];
 
+
+    console.log("Capabilities:", capabilities);
+console.log("Availability:", availability);
+console.log("Charges:", charges);
+console.log("Payments:", payments);
+console.log("Cancellation:", cancellation);
 return(
 
         <div>
@@ -150,7 +158,7 @@ return(
 
             {/* BASIC PROFILE */}
 
-                        <Accordion title="Artist Information">
+                        <Accordion title="Artist Information" defaultOpen> 
 
                             {!basic ? (
 
@@ -178,7 +186,7 @@ return(
 
             {/* SERVICES */}
 
-                        <Accordion title="Services">
+                        <Accordion title="Services" icon={<Briefcase />} >
 
                             {services?.length === 0 ? (
 

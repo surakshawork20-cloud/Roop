@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useAlert } from "@/components/ui/AlertProvider";
 
 export default function AvailabilityPage() {
 
@@ -11,6 +12,8 @@ export default function AvailabilityPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     init();
@@ -67,7 +70,11 @@ export default function AvailabilityPage() {
 
     if (error) {
       console.error(error);
-      alert("Error saving availability");
+      showAlert({
+        title: "Error",
+        description: "Error saving availability",
+        confirmText: "Okay"
+      });
       return;
     }
 

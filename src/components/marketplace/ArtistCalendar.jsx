@@ -38,11 +38,14 @@ const blockedSet = useMemo(() => {
 function getTileClass({ date, view }) {
 
   if (view !== "month") return;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const d = formatDate(date);
 
-  if (blockedSet.has(d)) return "calendar-red";
+  if (date < today) return "calendar-grey";
 
+  if (blockedSet.has(d)) return "calendar-red";
   if (bookingSet.has(d)) return "calendar-yellow";
 
   return "calendar-green";
@@ -107,7 +110,10 @@ return (
   onClick={() => setShowCalendar(false)}
 >
 
-    <div className="bg-white rounded-xl shadow-xl p-6 relative">
+    <div
+    className="bg-white rounded-xl shadow-xl p-6 relative"
+    onClick={(e) => e.stopPropagation()} // ✅ FIX
+  >
 
       <button
         onClick={() => setShowCalendar(false)}

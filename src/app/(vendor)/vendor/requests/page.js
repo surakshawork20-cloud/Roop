@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import AcceptBookingModal from "@/components/vendor/AcceptBookingModal";
+import AlertModal from "@/components/ui/AlertModal";
 
 
 export default function VendorBookingsPage() {
@@ -10,6 +11,7 @@ export default function VendorBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [rejectBooking, setRejectBooking] = useState(null);
 
   /* --------------------------
   FETCH BOOKINGS
@@ -98,14 +100,14 @@ export default function VendorBookingsPage() {
 
   return (
 
-    <div className="p-8 max-w-5xl">
+    <div className="p-8 max-w-5xl mx-auto  min-h-screen">
 
-      <h1 className="text-2xl font-semibold mb-6">
+      <h1 className="text-3xl font-semibold tracking-tight text-gray-900 mb-8">
         Booking Requests
-      </h1>
+        </h1>
 
       {loading && (
-        <p className="text-gray-500">
+        <p className="text-gray-500 animate-pulse">
           Loading booking requests...
         </p>
       )}
@@ -125,87 +127,79 @@ export default function VendorBookingsPage() {
           return (
 
             <div
-              key={booking.id}
-              className="border rounded-lg p-5 flex justify-between items-center"
-            >
+                key={booking.id}
+                className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+                >
 
-              {/* EVENT INFO */}
+                {/* LEFT SIDE */}
+                <div className="space-y-3">
 
-              <div className="space-y-1">
+                    {/* EVENT TITLE */}
+                    <div>
+                    <p className="text-lg font-semibold text-gray-900">
+                        {event?.event_name || "Unnamed Event"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                        {event?.event_date} • {event?.event_time}
+                    </p>
+                    </div>
 
-                <p className="font-medium">
-                  {event?.event_name || "Unnamed Event"}
-                </p>
+                    {/* CUSTOMER INFO */}
+                    <div className="text-sm text-gray-600 space-y-1">
+                    <p><span className="font-medium text-gray-800">Customer:</span> {event?.name}</p>
+                    <p><span className="font-medium text-gray-800">Phone:</span> {event?.phone}</p>
+                    {event?.email && (
+                        <p><span className="font-medium text-gray-800">Email:</span> {event.email}</p>
+                    )}
+                    </div>
 
-                <p className="text-sm text-gray-500">
-                  Customer: {event?.name}
-                </p>
+                    {/* LOCATION */}
+                    <p className="text-sm text-gray-500">
+                    📍 {event?.location}
+                    </p>
 
-                <p className="text-sm text-gray-500">
-                  {event?.event_date}
-                </p>
+                </div>
 
-                <p className="text-sm text-gray-500">
-                  {event?.event_time}
-                </p>
+                {/* RIGHT SIDE */}
+                <div className="flex flex-col items-end gap-3">
 
-                <p className="text-sm text-gray-500">
-                  {event?.location}
-                </p>
+                    {/* STATUS BADGE */}
+                    {booking.status === "accepted" && (
+                    <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-medium">
+                        Accepted
+                    </span>
+                    )}
 
-                <p className="text-sm text-gray-500">
-                  Phone: {event?.phone}
-                </p>
+                    {booking.status === "rejected" && (
+                    <span className="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700 font-medium">
+                        Rejected
+                    </span>
+                    )}
 
-                {event?.email && (
-                <p className="text-sm text-gray-500">
-                    Email: {event.email}
-                </p>
-                )}
+                    {/* ACTION BUTTONS */}
+                    {booking.status === "pending" && (
+                    <div className="flex gap-2">
 
-              </div>
+                        <button
+                        onClick={() => setSelectedBooking(booking)}
+                        className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition"
+                        >
+                        Accept
+                        </button>
 
-              {/* STATUS ACTIONS */}
+                        <button
+                        onClick={() => setRejectBooking(booking)}
+                        className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition"
+                        >
+                        Reject
+                        </button>
 
-              <div className="flex items-center gap-3">
+                    </div>
+                    )}
 
-                {booking.status === "pending" && (
+                </div>
 
-                  <>
-
-                    <button
-                      onClick={() => setSelectedBooking(booking)}
-                      className="bg-green-600 text-white px-4 py-2 rounded text-sm"
-                    >
-                      Accept
-                    </button>
-
-                    <button
-                      onClick={() => updateStatus(booking.id, "rejected")}
-                      className="bg-red-600 text-white px-4 py-2 rounded text-sm"
-                    >
-                      Reject
-                    </button>
-
-                  </>
-
-                )}
-
-                {booking.status === "accepted" && (
-                  <span className="text-green-600 font-medium">
-                    Accepted
-                  </span>
-                )}
-
-                {booking.status === "rejected" && (
-                  <span className="text-red-600 font-medium">
-                    Rejected
-                  </span>
-                )}
-
-              </div>
-
-            </div>
+                </div>
 
           );
 
@@ -223,7 +217,20 @@ export default function VendorBookingsPage() {
                 />
 
                 )}
-
+                {rejectBooking && (
+                    <AlertModal
+                        title="Reject Booking?"
+                        description="This action cannot be undone."
+                        confirmText="Yes, Reject"
+                        cancelText="Cancel"
+                        type="danger"
+                        onClose={() => setRejectBooking(null)}
+                        onConfirm={() => {
+                        updateStatus(rejectBooking.id, "rejected");
+                        setRejectBooking(null);
+                        }}
+                    />
+                    )}
     </div>
 
   );

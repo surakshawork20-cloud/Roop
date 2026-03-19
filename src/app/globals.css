@@ -16,7 +16,23 @@
 .calendar-red {
   background: #fecaca !important;
 }
+.calendar-grey {
+  background: #f3f4f6 !important;
+}
 
+.calendar-grey abbr {
+  color: #9ca3af !important;
+}
+/* Future weekends → black */
+.react-calendar__month-view__days__day--weekend {
+  color: black !important;
+}
+
+/* Selected date */
+.react-calendar__tile--active {
+  background: #111827 !important;
+  color: white !important;
+}
 /* 
 
 @font-face {
