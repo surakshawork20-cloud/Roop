@@ -91,7 +91,7 @@ Customer Login
 placeholder="Email"
 value={email}
 onChange={(e)=>setEmail(e.target.value)}
-className="border p-3 w-full rounded mb-4"
+className="border p-3 w-full rounded mb-4 bg-white text-black placeholder-gray-500"
 />
 
 <input
@@ -99,7 +99,7 @@ type="password"
 placeholder="Password"
 value={password}
 onChange={(e)=>setPassword(e.target.value)}
-className="border p-3 w-full rounded mb-6"
+className="border p-3 w-full rounded mb-4 bg-white text-black placeholder-gray-500"
 />
 
 <button
