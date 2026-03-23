@@ -6,133 +6,145 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Loader from "@/components/Loader";
 
-export default function CustomerSignup(){
+export default function CustomerSignup() {
+  const router = useRouter();
 
-const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-const [email,setEmail] = useState("");
-const [password,setPassword] = useState("");
-const [loading,setLoading] = useState(false);
+  async function signup() {
+    setLoading(true);
 
-async function signup(){
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-setLoading(true);
+    if (error) {
+      if (error.message.includes("already registered")) {
+        setLoading(false);
+        alert("Account exists. Please login.");
+        router.push("/customer/auth/login");
+        return;
+      }
 
-const { data, error } = await supabase.auth.signUp({
-email,
-password
-});
+      alert(error.message);
+      setLoading(false);
+      return;
+    }
 
-if(error){
+    const user = data.user;
 
-if(error.message.includes("already registered")){
-setLoading(false);
-alert("Account exists. Please login.");
-router.push("/customer/auth/login");
-return;
-}
+    // ⚠️ If email confirmation is enabled
+    if (!user) {
+      alert("Check your email to confirm signup.");
+      setLoading(false);
+      return;
+    }
 
-alert(error.message);
-setLoading(false);
-return;
-}
+    // ✅ Upsert profile
+    await supabase
+      .from("profiles")
+      .upsert(
+        {
+          id: user.id,
+          email: user.email,
+          is_customer: true,
+        },
+        { onConflict: "id" }
+      );
 
-const user = data.user;
+    // ✅ Ensure session is ready
+    const { data: userData } = await supabase.auth.getUser();
 
-await supabase
-.from("profiles")
-.upsert(
-{
-id: user.id,
-email: user.email,
-is_customer: true
-},
-{ onConflict: "id" }
-);
+    if (!userData.user) {
+      alert("Session not ready. Please login.");
+      setLoading(false);
+      router.push("/customer/auth/login");
+      return;
+    }
 
-router.replace("/");
+    // ✅ Set role FIRST
+    localStorage.setItem("activeRole", "customer");
 
-}
-return(
+    // ✅ Small delay (prevents race condition)
+    setTimeout(() => {
+      router.replace("/");
+    }, 100);
+  }
 
+  return (
     <>
-    {loading && <Loader fullscreen />}
+      {loading && <Loader fullscreen />}
 
-<div className="min-h-screen flex items-center justify-center bg-white">
+<div className="min-h-screen flex items-center justify-center bg-white px-4 sm:px-6">
 
-<div className="w-[900px] h-[520px] bg-[#F4EDE7] rounded-xl shadow-xl flex">
+<div className="w-full max-w-4xl min-h-[520px] bg-[#F4EDE7] rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row">
 
 {/* LEFT PANEL */}
 
-<div className="w-1/2 bg-[#691926] text-white flex flex-col items-center justify-center p-10">
+<div className="w-full md:w-1/2 bg-[#691926] text-[#F4EDE7] flex flex-col items-center justify-center px-6 py-10 sm:px-10">
+            <Image
+              src="/roop_logo.png"
+              alt="ROOP"
+              width={170}
+              height={80}
+            />
 
-<Image
-src="/roop_logo.png"
-alt="ROOP"
-width={170}
-height={80}
-/>
+            <h2 className="text-2xl sm:text-3xl mt-6 font-semibold text-center">
+              Join ROOP
+            </h2>
 
-<h2 className="text-3xl-[#F4EDE7] mt-6 font-semibold">
-Join ROOP
-</h2>
+            <p className="text-sm mt-3 text-center max-w-xs">
+              Discover and book amazing makeup artists.
+            </p>
 
-<p className="text-sm-[#F4EDE7] mt-3 text-center max-w-xs">
-Discover and book amazing makeup artists.
-</p>
+            <button
+              onClick={() => router.push("/customer/auth/login")}
+              className="mt-6 sm:mt-8 border border-white px-5 py-2 rounded hover:bg-white hover:text-[#691926] transition"
+            >
+              Login Instead
+            </button>
+          </div>
 
-<button
-onClick={()=>router.push("/customer/auth/login")}
-className="mt-8 border border-white px-6 py-2 rounded hover:bg-white hover:text-[#691926] transition"
->
-Login Instead
-</button>
+          {/* RIGHT FORM */}
+<div className="bg-[#F4EDE7] w-full md:w-1/2 flex items-center justify-center px-6 py-12 sm:py-16">
 
-</div>
+<div className="w-full max-w-sm mx-auto flex flex-col justify-center">
 
+              <h2 className="text-2xl font-semibold text-[#691926] mb-8 text-center">
+                Create Account
+              </h2>
 
-{/* RIGHT FORM */}
+              <input
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border p-3 w-full rounded mb-4 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#691926]/30"
+              />
 
-<div className="w-1/2 flex items-center justify-center">
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="border p-3 w-full rounded mb-6 bg-white text-black placeholder-gray-5000"
+              />
 
-<div className="w-[320px]">
+              <button
+                onClick={signup}
+                disabled={loading}
+                className="bg-[#691926] text-white w-full py-3 rounded active:scale-[0.98] transition flex items-center justify-center"
+              >
+                Create Account
+              </button>
 
-<h2 className="text-2xl font-semibold text-[#691926] mb-6 text-center">
-Create Account
-</h2>
+            </div>
+          </div>
 
-<input
-placeholder="Email"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-className="border p-3 w-full rounded mb-4 bg-white text-black placeholder-gray-500"
-/>
-
-<input
-type="password"
-placeholder="Password"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-className="border p-3 w-full rounded mb-4 bg-white text-black placeholder-gray-500"
-/>
-
-<button
-onClick={signup}
-disabled={loading}
-className="bg-[#691926] text-white w-full py-3 rounded disabled:opacity-60"
->
-Create Account
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</>
-);
-
+        </div>
+      </div>
+    </>
+  );
 }

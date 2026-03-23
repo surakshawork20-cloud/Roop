@@ -1,6 +1,8 @@
 import Navbar from "@/components/marketplace/Navbar";
 import ArtistCard from "@/components/marketplace/ArtistCard";
 import { supabase } from "@/lib/supabaseClient";
+import RoleGuard from "@/components/RoleGuard";
+
 
 export default async function Home({ searchParams }){
 
@@ -53,41 +55,40 @@ const artistsWithImages = (artists || []).map((artist)=>{
 
 return(
 
-<div>
+          <div>
 
-<Navbar/>
+          <Navbar/>
 
-<div className="max-w-7xl mx-auto px-8 py-10">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10">
 
-<h1 className="text-3xl font-semibold mb-8">
-Discover Artists
-</h1>
-{search && (
-  <p className="text-gray-500 mb-6">
-    Showing results for: <span className="font-semibold">{search}</span>
-  </p>
-)}
-{artistsWithImages.length === 0 ? (
+                    <h1 className="text-3xl font-semibold mb-8">
+                    Discover Artists
+                    </h1>
+                    {search && (
+                      <p className="text-gray-500 mb-6">
+                        Showing results for: <span className="font-semibold">{search}</span>
+                      </p>
+                    )}
+                    {artistsWithImages.length === 0 ? (
 
-  <p className="text-gray-500 text-lg">
-    No artists found
-  </p>
+                      <p className="text-gray-500 text-lg">
+                        No artists found
+                      </p>
 
-) : (
+                    ) : (
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                      <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
 
-    {artistsWithImages.map((artist)=>(
-      <ArtistCard key={artist.id} artist={artist}/>
-    ))}
+                        {artistsWithImages.map((artist)=>(
+                          <ArtistCard key={artist.id} artist={artist}/>
+                        ))}
 
-  </div>
+                      </div>
 
-)}
-</div>
+                    )}
+                    </div>
 
-</div>
-
+          </div>
 
 
 )
