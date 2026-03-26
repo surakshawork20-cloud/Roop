@@ -34,14 +34,13 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       {/* SIDEBAR */}
       <aside
         className={`
-          bg-white border-r h-full z-50
+          bg-[#F1E7DF] border-r h-full z-50
           transition-transform duration-300 w-64
+          shadow-sm md:shadow-none
 
-          /* Mobile */
           fixed top-0 left-0
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
 
-          /* Desktop */
           md:static md:translate-x-0
           flex flex-col
         `}
@@ -70,7 +69,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             {/* PROFILE DROPDOWN */}
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="w-full text-sm flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md"
+              className="w-full text-sm flex items-center justify-between px-3 py-2 text-gray-700 hover:bg-[#E2D3C6] hover:text-[#7A1820] font-semibold rounded-md"
             >
               <span>Profile</span>
               <span className="text-xs">
@@ -161,11 +160,11 @@ function SidebarItem({ href, label, pathname }) {
   return (
     <Link
       href={href}
-      className={`block px-3 py-2 rounded-md text-sm transition
+      className={`block px-4 py-2.5 rounded-lg text-sm transition-all duration-200
       ${
         active
-          ? "bg-gray-100 text-gray-900"
-          : "text-gray-600 hover:bg-gray-50"
+          ? "bg-[#E2D3C6] text-[#7A1820] font-semibold shadow-sm"
+          : "text-[#5C4A42] hover:bg-[#E8DCD1] hover:text-[#7A1820]"
       }`}
     >
       {label}

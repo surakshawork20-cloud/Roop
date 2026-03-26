@@ -154,17 +154,56 @@ export default function PortfolioPage() {
     </p>
 
     {/* Upload */}
+<div className="border border-dashed rounded p-4">
 
-    <input
-      type="file"
-      multiple
-      accept="image/*"
-      onChange={handleFileChange}
-    />
+  <label className="block text-sm font-medium mb-2">
+    Choose Photos
+  </label>
 
+  <input
+    type="file"
+    multiple
+    accept="image/*"
+    onChange={handleFileChange}
+    className="w-full mb-3"
+  />
+
+  {files.length === 0 ? (
+    <p className="text-sm text-gray-400">
+      No photos selected
+    </p>
+  ) : (
+    <div className="space-y-2">
+      {files.map((file, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between border rounded px-3 py-2 text-sm"
+        >
+          <span className="truncate w-[70%]">
+            {file.name}
+          </span>
+
+          <button
+            onClick={() =>
+              setFiles(prev => prev.filter((_, index) => index !== i))
+            }
+            className="text-red-500 text-xs"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <p className="text-xs text-gray-500 mt-3">
+    Upload up to 20 photos
+  </p>
+
+</div>
     {/* Photo Grid */}
 
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
 
       {photos.map(photo=>{
 
@@ -175,16 +214,16 @@ export default function PortfolioPage() {
 
         return(
 
-        <div key={photo.id} className="relative">
+        <div key={photo.id} className="relative group">
 
           <img
             src={url}
-            className="w-full h-32 object-cover rounded"
+            className="w-full h-28 sm:h-32 object-cover rounded"
           />
 
           <button
             onClick={()=>deletePhoto(photo.id,photo.photo_url)}
-            className="absolute top-1 right-1 bg-black text-white text-xs px-2 py-1 rounded"
+            className="absolute top-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition"
           >
             Delete
           </button>
@@ -217,7 +256,7 @@ export default function PortfolioPage() {
 
     <button
       onClick={savePortfolio}
-      className="bg-[#7A1820] text-white px-6 py-2 rounded"
+      className="bg-[#7A1820] text-white px-6 py-2 rounded w-full sm:w-auto"
     >
       {saving ? "Saving..." : "Save Portfolio"}
     </button>

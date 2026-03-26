@@ -85,7 +85,7 @@ export default function CancellationPolicyPage() {
 
     <div className="max-w-4xl">
 
-      <div className="flex justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between pb-2 gap-1">
 
         <h1 className="text-2xl font-semibold">
           Cancellation & Refund Policy
@@ -140,7 +140,7 @@ export default function CancellationPolicyPage() {
 
           <button
             onClick={savePolicy}
-            className="bg-[#7A1820] text-white px-6 py-2 rounded-md"
+            className="bg-[#7A1820] text-white px-6 py-2 rounded-md w-full sm:w-auto"
           >
             Save Policy
           </button>
@@ -187,7 +187,7 @@ function Scenario({ label, percentName, notesName, form, handleChange }) {
 
   return (
 
-    <div className="grid grid-cols-[260px_120px_1fr] gap-4 items-center">
+    <div className="flex flex-col sm:grid sm:grid-cols-[260px_120px_1fr] gap-3 sm:gap-4 sm:items-center border sm:border-0 rounded p-3 sm:p-0">
 
       <div className="text-gray-700">
         {label}
@@ -199,7 +199,7 @@ function Scenario({ label, percentName, notesName, form, handleChange }) {
         value={form[percentName] || ""}
         onChange={handleChange}
         placeholder="%"
-        className="border rounded px-3 py-2"
+        className="border rounded px-3 py-2 w-full sm:w-auto"
       />
 
       <input
@@ -207,7 +207,7 @@ function Scenario({ label, percentName, notesName, form, handleChange }) {
         value={form[notesName] || ""}
         onChange={handleChange}
         placeholder="Notes"
-        className="border rounded px-3 py-2"
+        className="border rounded px-3 py-2 w-full"
       />
 
     </div>
@@ -222,7 +222,7 @@ function Row({ label, value }) {
 
     <div className="flex justify-between border-b pb-2">
 
-      <span className="text-gray-500">
+      <span className="text-gray-700 text-sm sm:text-base font-medium">
         {label}
       </span>
 

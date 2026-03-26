@@ -77,7 +77,7 @@ export default function VendorLayout({ children }) {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#FAF7F5]">
+    <div className="h-screen flex flex-col bg-[#F4EDE7]">
 
       {/* NAVBAR */}
       <Navbar setSidebarOpen={setSidebarOpen} />

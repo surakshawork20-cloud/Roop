@@ -17,9 +17,23 @@ export default function VendorBookings() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+
+
     init();
+
+
+
+  function handleResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   async function init() {
@@ -35,6 +49,7 @@ export default function VendorBookings() {
     fetchBookings(id);
     fetchBlockedDates(id);
   }
+  
 
   async function fetchBookings(vendorId) {
 
@@ -95,6 +110,7 @@ async function fetchBlockedDates(vendorId) {
     return "calendar-yellow";
   }
 
+
   return (
 
     <div className="max-w-6xl space-y-6">
@@ -140,69 +156,100 @@ async function fetchBlockedDates(vendorId) {
 
       )}
 
-      {/* BOOKINGS TABLE */}
+      {isMobile ? (
+  /* MOBILE VIEW */
+  <div className="space-y-4">
+    {bookings.map((b) => (
+      <div key={b.id} className="border rounded p-3 space-y-2 shadow-sm">
 
-      <div className="border rounded-lg overflow-hidden">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">Date</span>
+          <span>{b.booking_date}</span>
+        </div>
 
-        <table className="w-full">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">Time</span>
+          <span>{b.start_time} - {b.end_time}</span>
+        </div>
 
-          <thead className="bg-gray-50">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">Event</span>
+          <span>{b.event_name}</span>
+        </div>
 
-            <tr>
-              <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Time</th>
-              <th className="p-3 text-left">Event</th>
-              <th className="p-3 text-left">Location</th>
-              <th className="p-3 text-left">Customer</th>
-              <th className="p-3 text-left">Action</th>
-            </tr>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">Location</span>
+          <span className="text-right">{b.location}</span>
+        </div>
 
-          </thead>
+        <div className="text-sm">
+          <div className="text-gray-500">Customer</div>
+          <div>{b.customer_name}</div>
+          <div className="text-xs text-gray-500">
+            {b.customer_phone}
+          </div>
+        </div>
 
-          <tbody>
-
-            {bookings.map((b) => (
-
-              <tr key={b.id} className="border-t">
-
-                <td className="p-3">{b.booking_date}</td>
-
-                <td className="p-3">
-                  {b.start_time} - {b.end_time}
-                </td>
-
-                <td className="p-3">{b.event_name}</td>
-
-                <td className="p-3">{b.location}</td>
-
-                <td className="p-3">
-                  {b.customer_name}
-                  <br />
-                  <span className="text-xs text-gray-500">
-                    {b.customer_phone}
-                  </span>
-                </td>
-
-                <td className="p-3">
-
-                  <button
-                    onClick={() => deleteBooking(b.id)}
-                    className="text-red-600 text-sm"
-                  >
-                    Delete
-                  </button>
-
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
+        <button
+          onClick={() => deleteBooking(b.id)}
+          className="text-red-600 text-sm"
+        >
+          Delete
+        </button>
 
       </div>
+    ))}
+  </div>
+) : (
+  /* DESKTOP TABLE */
+  <div className="border rounded-lg overflow-hidden">
+    <table className="w-full">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="p-3 text-left">Date</th>
+          <th className="p-3 text-left">Time</th>
+          <th className="p-3 text-left">Event</th>
+          <th className="p-3 text-left">Location</th>
+          <th className="p-3 text-left">Customer</th>
+          <th className="p-3 text-left">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {bookings.map((b) => (
+          <tr key={b.id} className="border-t">
+            <td className="p-3">{b.booking_date}</td>
+
+            <td className="p-3">
+              {b.start_time} - {b.end_time}
+            </td>
+
+            <td className="p-3">{b.event_name}</td>
+
+            <td className="p-3">{b.location}</td>
+
+            <td className="p-3">
+              {b.customer_name}
+              <br />
+              <span className="text-xs text-gray-500">
+                {b.customer_phone}
+              </span>
+            </td>
+
+            <td className="p-3">
+              <button
+                onClick={() => deleteBooking(b.id)}
+                className="text-red-600 text-sm"
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
 
       {showBookingModal && (
         <BookingModal
