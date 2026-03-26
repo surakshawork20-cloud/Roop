@@ -4,19 +4,28 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AdditionalCharges() {
-
   const [charges, setCharges] = useState([]);
   const [userId, setUserId] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(false);
+
   useEffect(() => {
     init();
+
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   async function init() {
-
     const { data } = await supabase.auth.getUser();
     const user = data.user;
 
@@ -37,7 +46,6 @@ export default function AdditionalCharges() {
   }
 
   function addCharge() {
-
     setCharges([
       ...charges,
       {
@@ -45,30 +53,24 @@ export default function AdditionalCharges() {
         fee_type: "",
         amount: "",
         note: "",
-        comments: ""
-      }
+        comments: "",
+      },
     ]);
-
   }
 
   function updateCharge(index, field, value) {
-
     const updated = [...charges];
     updated[index][field] = value;
-
     setCharges(updated);
   }
 
   function removeCharge(index) {
-
     const updated = [...charges];
     updated.splice(index, 1);
-
     setCharges(updated);
   }
 
   async function saveCharges() {
-
     setSaving(true);
 
     await supabase
@@ -82,11 +84,10 @@ export default function AdditionalCharges() {
       fee_type: c.fee_type,
       amount: c.amount ? Number(c.amount) : null,
       note: c.note,
-      comments: c.comments
+      comments: c.comments,
     }));
 
     if (rows.length > 0) {
-
       const { error } = await supabase
         .from("vendor_additional_charges")
         .insert(rows);
@@ -97,12 +98,10 @@ export default function AdditionalCharges() {
         setSaving(false);
         return;
       }
-
     }
 
     setSaving(false);
     alert("Charges saved");
-
   }
 
   if (loading) {
@@ -110,126 +109,168 @@ export default function AdditionalCharges() {
   }
 
   return (
-
     <div>
 
-      <table className="w-full text-sm border">
-
-        <thead className="bg-gray-50">
-
-          <tr>
-
-            <th className="border p-2">Charge Type</th>
-            <th className="border p-2">Fee Type</th>
-            <th className="border p-2">Amount</th>
-            <th className="border p-2">Note</th>
-            <th className="border p-2">Comments</th>
-            <th className="border p-2"></th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
+      {/* MOBILE VIEW */}
+      {isMobile ? (
+        <div className="space-y-4">
           {charges.map((c, i) => (
+            <div key={i} className="border rounded p-3 shadow-sm space-y-2">
 
-            <tr key={i}>
+              <input
+                placeholder="Charge Type"
+                value={c.charge_type}
+                onChange={(e) =>
+                  updateCharge(i, "charge_type", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
+              <select
+                value={c.fee_type}
+                onChange={(e) =>
+                  updateCharge(i, "fee_type", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              >
+                <option value="">Fee Type</option>
+                <option value="fixed">Fixed</option>
+                <option value="per_km">Per km</option>
+                <option value="per_hour">Per hour</option>
+                <option value="other">Other</option>
+              </select>
 
-                <input
-                  value={c.charge_type}
-                  onChange={(e) =>
-                    updateCharge(i, "charge_type", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
+              <input
+                type="number"
+                placeholder="Amount"
+                value={c.amount}
+                onChange={(e) =>
+                  updateCharge(i, "amount", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              </td>
+              <input
+                placeholder="Note"
+                value={c.note}
+                onChange={(e) =>
+                  updateCharge(i, "note", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
+              <input
+                placeholder="Comments"
+                value={c.comments}
+                onChange={(e) =>
+                  updateCharge(i, "comments", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-                <select
-                  value={c.fee_type}
-                  onChange={(e) =>
-                    updateCharge(i, "fee_type", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                >
+              <button
+                onClick={() => removeCharge(i)}
+                className="text-red-600 text-sm"
+              >
+                Delete
+              </button>
 
-                  <option value="">Select</option>
-                  <option value="fixed">Fixed</option>
-                  <option value="per_km">Per km</option>
-                  <option value="per_hour">Per hour</option>
-                  <option value="other">Other</option>
-
-                </select>
-
-              </td>
-
-              <td className="border p-2">
-
-                <input
-                  type="number"
-                  value={c.amount}
-                  onChange={(e) =>
-                    updateCharge(i, "amount", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-
-              </td>
-
-              <td className="border p-2">
-
-                <input
-                  value={c.note}
-                  onChange={(e) =>
-                    updateCharge(i, "note", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-
-              </td>
-
-              <td className="border p-2">
-
-                <input
-                  value={c.comments}
-                  onChange={(e) =>
-                    updateCharge(i, "comments", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-
-              </td>
-
-              <td className="border p-2">
-
-                <button
-                  onClick={() => removeCharge(i)}
-                  className="text-red-600 text-sm"
-                >
-                  Delete
-                </button>
-
-              </td>
-
-            </tr>
-
+            </div>
           ))}
+        </div>
+      ) : (
+        /* DESKTOP TABLE */
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-[700px] w-full text-sm border">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="border p-2">Charge Type</th>
+                <th className="border p-2">Fee Type</th>
+                <th className="border p-2">Amount</th>
+                <th className="border p-2">Note</th>
+                <th className="border p-2">Comments</th>
+                <th className="border p-2"></th>
+              </tr>
+            </thead>
 
-        </tbody>
+            <tbody>
+              {charges.map((c, i) => (
+                <tr key={i}>
+                  <td className="border p-2">
+                    <input
+                      value={c.charge_type}
+                      onChange={(e) =>
+                        updateCharge(i, "charge_type", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
 
-      </table>
+                  <td className="border p-2">
+                    <select
+                      value={c.fee_type}
+                      onChange={(e) =>
+                        updateCharge(i, "fee_type", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    >
+                      <option value="">Select</option>
+                      <option value="fixed">Fixed</option>
+                      <option value="per_km">Per km</option>
+                      <option value="per_hour">Per hour</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </td>
 
-      <div className="flex gap-4 mt-4">
+                  <td className="border p-2">
+                    <input
+                      type="number"
+                      value={c.amount}
+                      onChange={(e) =>
+                        updateCharge(i, "amount", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
 
-        <button
-          onClick={addCharge}
-          className="text-[#7A1820]"
-        >
+                  <td className="border p-2">
+                    <input
+                      value={c.note}
+                      onChange={(e) =>
+                        updateCharge(i, "note", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
+
+                  <td className="border p-2">
+                    <input
+                      value={c.comments}
+                      onChange={(e) =>
+                        updateCharge(i, "comments", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
+
+                  <td className="border p-2">
+                    <button
+                      onClick={() => removeCharge(i)}
+                      className="text-red-600 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* BUTTONS */}
+      <div className="flex flex-col sm:flex-row gap-3 mt-4">
+        <button onClick={addCharge} className="text-[#7A1820]">
           + Add Charge
         </button>
 
@@ -240,10 +281,8 @@ export default function AdditionalCharges() {
         >
           {saving ? "Saving..." : "Save Charges"}
         </button>
-
       </div>
 
     </div>
-
   );
 }

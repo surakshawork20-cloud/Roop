@@ -44,7 +44,6 @@ export default function ServiceMenuMarriage() {
     setServices([
       ...services,
       {
-        service_group: "",
         service_name: "",
         price: "",
         duration: "",
@@ -103,7 +102,6 @@ if (validServices.length === 0) {
     const rows = services.map((s) => ({
   vendor_id: userId,
   event_type: "marriage",
-  service_group: s.service_group,
   service_name: s.service_name,
   price: Number(s.price),
   duration: s.duration ? Number(s.duration) : null,
@@ -131,126 +129,167 @@ if (validServices.length === 0) {
   if (loading) {
     return <div>Loading services...</div>;
   }
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
 
     <div>
-
       {completed && (
         <div className="text-green-600 text-sm mb-3">
           ✓ Services saved
         </div>
       )}
 
-      <table className="w-full text-sm border">
-
-        <thead className="bg-gray-50">
-
-          <tr>
-            <th className="border p-2">Group *</th>
-            <th className="border p-2">Service *</th>
-            <th className="border p-2">Price *</th>
-            <th className="border p-2">Duration (in mins)</th>
-            <th className="border p-2">Inclusions</th>
-            <th className="border p-2">Exclusions</th>
-            <th className="border p-2"></th>
-          </tr>
-
-        </thead>
-
-        <tbody>
-
+      {/* MOBILE VIEW */}
+      {isMobile ? (
+        <div className="space-y-4">
           {services.map((service, i) => (
+            <div key={i} className="border rounded p-3 shadow-sm space-y-2">
 
-            <tr key={i}>
+              <input
+                placeholder="Service *"
+                value={service.service_name}
+                onChange={(e) =>
+                  updateService(i, "service_name", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
-                <input
-                  value={service.service_group}
-                  onChange={(e) =>
-                    updateService(i, "service_group", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
+              <input
+                type="number"
+                placeholder="Price *"
+                value={service.price}
+                onChange={(e) =>
+                  updateService(i, "price", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
-                <input
-                  value={service.service_name}
-                  onChange={(e) =>
-                    updateService(i, "service_name", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
+              <input
+                type="number"
+                placeholder="Duration (mins)"
+                value={service.duration}
+                onChange={(e) =>
+                  updateService(i, "duration", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
-                <input
-                  type="number"
-                  value={service.price}
-                  onChange={(e) =>
-                    updateService(i, "price", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
+              <input
+                placeholder="Inclusions"
+                value={service.inclusions}
+                onChange={(e) =>
+                  updateService(i, "inclusions", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
-                <input
-                  type="number"
-                  value={service.duration}
-                  onChange={(e) =>
-                    updateService(i, "duration", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
+              <input
+                placeholder="Exclusions"
+                value={service.exclusions}
+                onChange={(e) =>
+                  updateService(i, "exclusions", e.target.value)
+                }
+                className="w-full border rounded px-2 py-2"
+              />
 
-              <td className="border p-2">
-                <input
-                  value={service.inclusions}
-                  onChange={(e) =>
-                    updateService(i, "inclusions", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-
-              <td className="border p-2">
-                <input
-                  value={service.exclusions}
-                  onChange={(e) =>
-                    updateService(i, "exclusions", e.target.value)
-                  }
-                  className="w-full border rounded px-2 py-1"
-                />
-              </td>
-
-              <td className="border p-2">
-
-                <button
-                  onClick={() => removeService(i)}
-                  className="text-red-600 text-sm"
-                >
-                  Delete
-                </button>
-
-              </td>
-
-            </tr>
-
+              <button
+                onClick={() => removeService(i)}
+                className="text-red-600 text-sm"
+              >
+                Delete
+              </button>
+            </div>
           ))}
+        </div>
+      ) : (
+        /* DESKTOP TABLE */
+        <div className="w-full overflow-x-auto">
+          <table className="min-w-[700px] w-full text-sm border">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="border p-2">Service *</th>
+                <th className="border p-2">Price *</th>
+                <th className="border p-2">Duration</th>
+                <th className="border p-2">Inclusions</th>
+                <th className="border p-2">Exclusions</th>
+                <th className="border p-2"></th>
+              </tr>
+            </thead>
 
-        </tbody>
+            <tbody>
+              {services.map((service, i) => (
+                <tr key={i}>
+                  <td className="border p-2">
+                    <input
+                      value={service.service_name}
+                      onChange={(e) =>
+                        updateService(i, "service_name", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
 
-      </table>
+                  <td className="border p-2">
+                    <input
+                      type="number"
+                      value={service.price}
+                      onChange={(e) =>
+                        updateService(i, "price", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
 
-      <div className="flex gap-4 mt-4">
+                  <td className="border p-2">
+                    <input
+                      type="number"
+                      value={service.duration}
+                      onChange={(e) =>
+                        updateService(i, "duration", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
 
-        <button
-          onClick={addService}
-          className="text-[#7A1820]"
-        >
+                  <td className="border p-2">
+                    <input
+                      value={service.inclusions}
+                      onChange={(e) =>
+                        updateService(i, "inclusions", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
+
+                  <td className="border p-2">
+                    <input
+                      value={service.exclusions}
+                      onChange={(e) =>
+                        updateService(i, "exclusions", e.target.value)
+                      }
+                      className="w-full border rounded px-2 py-1"
+                    />
+                  </td>
+
+                  <td className="border p-2">
+                    <button
+                      onClick={() => removeService(i)}
+                      className="text-red-600 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* BUTTONS */}
+      <div className="flex flex-col sm:flex-row gap-3 mt-4">
+        <button onClick={addService} className="text-[#7A1820]">
           + Add Service
         </button>
 
@@ -261,10 +300,7 @@ if (validServices.length === 0) {
         >
           {saving ? "Saving..." : "Save Services"}
         </button>
-
       </div>
-
     </div>
-
   );
 }

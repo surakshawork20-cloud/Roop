@@ -122,16 +122,16 @@ export default function AvailabilityPage() {
 
           {days.map((day) => (
 
-            <div
-              key={day}
-              className="grid grid-cols-[140px_320px_1fr] gap-6 items-center"
-            >
+<div
+  key={day}
+  className="flex flex-col sm:grid sm:grid-cols-[140px_320px_1fr] gap-3 sm:gap-6 sm:items-center p-3 sm:p-0"
+>
 
               <div className="capitalize font-medium">
                 {day}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
 
                 <input
                     type="time"
@@ -142,10 +142,10 @@ export default function AvailabilityPage() {
                     onChange={(e) =>
                       update(day, "from", e.target.value)
                     }
-                    className="border rounded px-2 py-1"
+                    className="border rounded px-2 py-2 w-full sm:w-auto"
                   />
 
-                <span className="text-gray-500">to</span>
+                <span className="text-gray-500 text-center sm:text-left">to</span>
 
                 <input
                   type="time"
@@ -154,7 +154,7 @@ export default function AvailabilityPage() {
                   onChange={(e) =>
                     update(day, "to", e.target.value)
                   }
-                  className="border rounded px-2 py-1"
+                  className="border rounded px-2 py-2 w-full sm:w-auto"
                 />
 
               </div>
@@ -175,7 +175,7 @@ export default function AvailabilityPage() {
 
           <button
             onClick={saveAvailability}
-            className="bg-[#7A1820] text-white px-6 py-2 rounded"
+            className="bg-[#7A1820] text-white px-6 py-2 rounded w-full sm:w-auto"
           >
             Save Availability
           </button>
