@@ -117,19 +117,19 @@ export default function BasicProfilePage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
 
       {/* HEADER */}
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+        <h1 className="text-xl sm:text-2xl font-semibold">
           Basic Profile Information
         </h1>
 
         {saved && !editing && (
           <button
             onClick={() => setEditing(true)}
-            className="text-sm text-[#7A1820]"
+            className="text-sm text-[#7A1820] self-start sm:self-auto"
           >
             Edit
           </button>
@@ -184,7 +184,7 @@ export default function BasicProfilePage() {
               Service Mode <span className="text-red-500">*</span>
             </label>
 
-            <div className="flex gap-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
 
               <label className="flex items-center gap-2">
                 <input
@@ -232,7 +232,7 @@ export default function BasicProfilePage() {
           <button
             onClick={saveProfile}
             disabled={saving}
-            className="bg-[#7A1820] text-white px-6 py-2 rounded-md"
+            className="w-full sm:w-auto bg-[#7A1820] text-white px-6 py-2 rounded-md"
           >
             {saving ? "Saving..." : "Save"}
           </button>

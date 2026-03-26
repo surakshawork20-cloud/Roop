@@ -5,30 +5,32 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/vendor/Sidebar";
 import Navbar from "@/components/vendor/Navbar";
-import RoleGuard from "@/components/RoleGuard";
 
 export default function VendorLayout({ children }) {
 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState(undefined); // IMPORTANT
+  const [role, setRole] = useState(undefined);
 
-useEffect(() => {
-  const storedRole = localStorage.getItem("activeRole");
-
-  if (!storedRole) {
-    setRole(null); // explicitly invalid
-  } else {
-    setRole(storedRole);
-  }
-}, []);
+  // 👇 ADD THIS
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
+    const storedRole = localStorage.getItem("activeRole");
 
+    if (!storedRole) {
+      setRole(null);
+    } else {
+      setRole(storedRole);
+    }
+  }, []);
+
+  useEffect(() => {
     if (role === undefined) return;
+
     if (role === null) {
       router.replace("/");
-    return;
+      return;
     }
 
     const checkVendor = async () => {
@@ -75,30 +77,26 @@ useEffect(() => {
   }
 
   return (
+    <div className="h-screen flex flex-col bg-[#FAF7F5]">
 
-<div className="min-h-screen flex flex-col bg-[#FAF7F5]">
+      {/* NAVBAR */}
+      <Navbar setSidebarOpen={setSidebarOpen} />
 
-    {/* FULL WIDTH NAVBAR */}
-    <div className="h-16 bg-[#691926]">
-      <Navbar />
-    </div>
+      {/* BODY */}
+      <div className="flex flex-1 overflow-hidden">
 
-    {/* BELOW NAVBAR */}
-    <div className="flex flex-1">
+        {/* Sidebar (NO wrapper div anymore ❌) */}
+        <Sidebar
+          isOpen={sidebarOpen}
+          setIsOpen={setSidebarOpen}
+        />
 
-      {/* Sidebar */}
-      <div className="w-64 bg-white border-r">
-        <Sidebar />
+        {/* Content */}
+        <main className="flex-1 p-6 overflow-y-auto">
+          {children}
+        </main>
+
       </div>
-
-      {/* Content */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        {children}
-      </div>
-
     </div>
-
-  </div>
-
   );
 }

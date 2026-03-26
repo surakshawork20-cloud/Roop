@@ -72,39 +72,43 @@ export default function AcceptBookingModal({
 
   return (
   <div
-    className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+    className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
     onClick={onClose}
   >
     <div
-      className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-6 animate-fadeIn"
+      className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl
+        w-full sm:max-w-md
+        max-h-[90vh] overflow-y-auto
+        p-4 sm:p-6 space-y-5 sm:space-y-6
+        animate-fadeIn"
       onClick={(e) => e.stopPropagation()}
     >
 
       {/* HEADER */}
       <div className="space-y-1">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           Confirm Booking
         </h2>
-        <p className="text-sm text-gray-500">
+        <p className="text-xs sm:text-sm text-gray-500">
           Add time and confirm this request
         </p>
       </div>
 
       {/* EVENT DETAILS */}
-      <div className="border border-gray-200 rounded-xl p-4 bg-gray-50 space-y-2">
-        <p className="font-medium text-gray-900">
+      <div className="border border-gray-200 rounded-xl p-3 sm:p-4 bg-gray-50 space-y-2">
+        <p className="font-medium text-gray-900 text-sm sm:text-base">
           {event?.event_name || "Unnamed Event"}
         </p>
 
-        <p className="text-sm text-gray-600">
+        <p className="text-xs sm:text-sm text-gray-600">
           {event?.event_date} • {event?.event_time}
         </p>
 
-        <p className="text-sm text-gray-600">
+        <p className="text-xs sm:text-sm text-gray-600 break-words">
           {event?.location}
         </p>
 
-        <div className="pt-2 text-sm text-gray-700">
+        <div className="pt-2 text-xs sm:text-sm text-gray-700 space-y-1">
           <p><span className="font-medium">Customer:</span> {event?.name}</p>
           <p><span className="font-medium">Phone:</span> {event?.phone}</p>
           {event?.email && (
@@ -119,7 +123,7 @@ export default function AcceptBookingModal({
                 Block your time
             </p>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
                 {/* START TIME */}
                 <div className="space-y-1">
@@ -151,7 +155,7 @@ export default function AcceptBookingModal({
             </div>
 
       {/* ACTIONS */}
-      <div className="flex gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
 
         <button
           onClick={confirmBooking}
@@ -164,7 +168,7 @@ export default function AcceptBookingModal({
 
         <button
           onClick={onClose}
-          className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          className="px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition w-full sm:w-auto"
         >
           Cancel
         </button>

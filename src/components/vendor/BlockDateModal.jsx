@@ -76,33 +76,36 @@ export default function BlockDateModal({ userId, onClose, refresh }) {
   return (
 
     <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center z-50"
       onClick={onClose}
     >
 
       <div
-        className="bg-white p-6 rounded-lg w-[420px] space-y-6 max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-t-2xl sm:rounded-lg
+        w-full sm:max-w-md
+        max-h-[90vh] overflow-y-auto
+        p-4 sm:p-6 space-y-5"
         onClick={(e) => e.stopPropagation()}
       >
 
-        <h2 className="font-semibold text-lg">
+        <h2 className="font-semibold text-base sm:text-lg">
           Block Date
         </h2>
 
         {/* DATE INPUT */}
 
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
 
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border p-2 w-full rounded"
+            className="border p-2.5 w-full rounded-md text-sm sm:text-base"
           />
 
           <button
             onClick={blockDay}
-            className="bg-gray-800 text-white px-4 py-2 rounded"
+            className="bg-gray-800 text-white px-4 py-2.5 rounded-md w-full sm:w-auto"
           >
             Block
           </button>
@@ -127,7 +130,7 @@ export default function BlockDateModal({ userId, onClose, refresh }) {
 
             <div
               key={d.id}
-              className="flex justify-between items-center border p-2 rounded"
+              className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 border p-3 rounded-md"
             >
 
               <span className="text-sm">
@@ -136,7 +139,7 @@ export default function BlockDateModal({ userId, onClose, refresh }) {
 
               <button
                 onClick={() => unblockDate(d.id)}
-                className="text-red-600 text-sm"
+                className="text-red-600 text-sm self-start sm:self-auto"
               >
                 Unblock
               </button>
@@ -149,11 +152,11 @@ export default function BlockDateModal({ userId, onClose, refresh }) {
 
         {/* CLOSE BUTTON */}
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-2">
 
           <button
             onClick={onClose}
-            className="text-gray-500"
+            className="text-gray-500 text-sm"
           >
             Close
           </button>
