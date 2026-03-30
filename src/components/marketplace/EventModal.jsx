@@ -139,6 +139,7 @@ return (
       <input
         type="date"
         name="event_date"
+        placeholder="Event Date"
         value={eventForm.event_date}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
@@ -147,7 +148,8 @@ return (
 
         <input
           type="time"
-          name="event_time"
+          name="Event Time"
+          placeholder="Event Location"
           value={eventForm.event_time}
           onChange={handleEventChange}
           className="border p-2 w-full rounded"
