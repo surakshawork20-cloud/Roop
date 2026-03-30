@@ -151,7 +151,6 @@ return(
                                 <BookingModal vendorId={vendorId} />
 
                             </div>
-
             {/* PORTFOLIO */}
 
                         <PortfolioCarousel images={images}/>

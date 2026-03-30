@@ -105,7 +105,7 @@ export default function ServiceCapabilities() {
       {/* Dark Skin */}
 
       <RadioGroup
-        label="Comfortable with dusky/dark skintone"
+        label="Experienced with dusky/dark skintone"
         value={form.comfortable_dark_skin}
         options={["Yes","No"]}
         onChange={(v)=>update("comfortable_dark_skin",v==="Yes")}

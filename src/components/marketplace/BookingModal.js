@@ -218,6 +218,10 @@ return (
 
         {/* ADD EVENT BUTTON */}
 
+        <p className="text-xs text-gray-500 leading-relaxed">
+          * Roop is a platform for discovering beauty professionals. We do not guarantee or take responsibility for the quality or outcome of services provided by artists.
+        </p>
+
         <div className="pt-3 border-t flex justify-between items-center">
 
           <button

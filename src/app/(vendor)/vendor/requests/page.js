@@ -144,10 +144,10 @@ export default function VendorBookingsPage() {
                     </p>
                     </div>
 
-                    {/* CUSTOMER INFO */}
+                    {/*  CUSTOMER INFO */}
                     <div className="text-sm text-gray-600 space-y-1">
                     <p><span className="font-medium text-gray-800">Customer:</span> {event?.name}</p>
-                    <p><span className="font-medium text-gray-800">Phone:</span> {event?.phone}</p>
+                    {/* <p><span className="font-medium text-gray-800">Phone:</span> {event?.phone}</p> */}
                     {event?.email && (
                         <p><span className="font-medium text-gray-800">Email:</span> {event.email}</p>
                     )}

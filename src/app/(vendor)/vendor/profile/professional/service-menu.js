@@ -74,7 +74,6 @@ export default function ServiceMenuMarriage() {
 
     const validServices = services.filter(
   (s) =>
-    s.service_group &&
     s.service_name &&
     s.price
 );
