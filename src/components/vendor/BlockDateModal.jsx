@@ -134,7 +134,7 @@ export default function BlockDateModal({ userId, onClose, refresh }) {
             >
 
               <span className="text-sm">
-                {d.blocked_date}
+                {new Date(d.blocked_date).toLocaleDateString("en-GB")}
               </span>
 
               <button

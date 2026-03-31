@@ -106,12 +106,12 @@ export default function ServiceCapabilities() {
 
       <RadioGroup
         label="Experienced with dusky/dark skintone"
-        value={form.comfortable_dark_skin}
+        value={form.experience_dark_skin}
         options={["Yes","No"]}
-        onChange={(v)=>update("comfortable_dark_skin",v==="Yes")}
+        onChange={(v)=>update("experience_dark_skin",v==="Yes")}
       />
 
-      {form.comfortable_dark_skin && (
+      {form.experience_dark_skin && (
         <Input
           label="Details"
           value={form.dark_skin_details}
@@ -141,22 +141,42 @@ export default function ServiceCapabilities() {
       <div>
 
         <label className="font-medium block mb-2">
-          Products Used (Top 5 Brands)
+          Products Used
         </label>
 
-        <div className="grid grid-cols-2 gap-3">
+        {(form.brands || []).map((brand, index) => (
+          <div key={index} className="flex gap-2 mb-2">
 
-          {[1,2,3,4,5].map((n)=>(
             <input
-              key={n}
-              placeholder={`Brand ${n}`}
-              value={form[`brand${n}`] || ""}
-              onChange={(e)=>update(`brand${n}`,e.target.value)}
-              className="border rounded px-3 py-2"
+              value={brand}
+              onChange={(e) => {
+                const updated = [...(form.brands || [])];
+                updated[index] = e.target.value;
+                update("brands", updated);
+              }}
+              className="border rounded px-3 py-2 w-full"
             />
-          ))}
 
-        </div>
+            <button
+              onClick={() => {
+                const updated = form.brands.filter((_, i) => i !== index);
+                update("brands", updated);
+              }}
+            >
+              ❌
+            </button>
+
+          </div>
+        ))}
+
+        <button
+          onClick={() => {
+            update("brands", [...(form.brands || []), ""]);
+          }}
+          className="text-sm text-blue-600"
+        >
+          + Add Brand
+        </button>
 
       </div>
 

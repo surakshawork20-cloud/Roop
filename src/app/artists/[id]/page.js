@@ -98,8 +98,7 @@ const { data: cancellation } = await supabase
     .from("vendor_cancellation_policy")
     .select("*")
     .eq("vendor_id", vendorId)
-    .single();
-
+    .maybeSingle();
   /* --------------------------
   FETCH WEEKLY AVAILABILITY
   -------------------------- */
@@ -109,7 +108,7 @@ const { data: availabilityData } = await supabase
     .from("vendor_availability")
     .select("*")
     .eq("vendor_id", vendorId)
-    .order("day_of_week");
+    .single();
 
   const availability = availabilityData || [];
 
@@ -124,11 +123,29 @@ const images = photos?.map((p)=>{
     }) || [];
 
 
-    console.log("Capabilities:", capabilities);
-console.log("Availability:", availability);
-console.log("Charges:", charges);
-console.log("Payments:", payments);
-console.log("Cancellation:", cancellation);
+
+
+const hasCapabilities =
+  capabilities &&
+  (
+    capabilities.years_experience ||
+    capabilities.expertise ||
+    capabilities.artist_type ||
+    capabilities.team_size ||
+    capabilities.max_bookings ||
+    capabilities.lead_time_hours ||
+    capabilities.outstation_available !== null ||
+    capabilities.outstation_conditions ||
+    capabilities.allergy_handling ||
+    capabilities.experience_dark_skin !== null ||
+    capabilities.dark_skin_details ||
+    (capabilities.brands && capabilities.brands.length > 0) ||
+    capabilities.hygiene_brush_sanitised ||
+    capabilities.hygiene_disposable ||
+    capabilities.hygiene_sanitised_kit ||
+    capabilities.hygiene_fresh_sponges
+  );
+
 return(
 
         <div>
@@ -244,13 +261,109 @@ return(
 
                                 <div className="space-y-2">
 
-                                <p>Experience: {capabilities.years_experience} years</p>
-                                <p>Expertise: {capabilities.expertise}</p>
-                                <p>Team: {capabilities.team_type}</p>
-                                <p>Max Bookings Per Day: {capabilities.max_bookings}</p>
+                                {capabilities.years_experience && (
+                                        <p>Experience: {capabilities.years_experience} years</p>
+                                    )}
+
+                                    {/* EXPERTISE */}
+                                    {capabilities.expertise && (
+                                        <p>Expertise: {capabilities.expertise}</p>
+                                    )}
+
+                                    {/* ARTIST TYPE + TEAM SIZE */}
+                                    {capabilities.artist_type && (
+                                        <p>
+                                        Artist Type: {capabilities.artist_type}
+                                        {capabilities.artist_type === "Team" && capabilities.team_size && (
+                                            <> ({capabilities.team_size} members)</>
+                                        )}
+                                        </p>
+                                    )}
+
+                                    {/* BOOKINGS */}
+                                    {capabilities.max_bookings && (
+                                        <p>Max Bookings Per Day: {capabilities.max_bookings}</p>
+                                    )}
+
+                                    {/* LEAD TIME */}
+                                    {capabilities.lead_time_hours && (
+                                        <p>Minimum Booking Notice: {capabilities.lead_time_hours} hrs</p>
+                                    )}
+
+                                    {/* DARK SKIN */}
+                                    {capabilities.experience_dark_skin !== null && (
+                                        <p>
+                                        Experience Working on Dark Skin:{" "}
+                                        {capabilities.experience_dark_skin ? "✔ Yes" : "✖ No"}
+                                        </p>
+                                    )}
+
+                                    {capabilities.dark_skin_details && (
+                                        <p>Details: {capabilities.dark_skin_details}</p>
+                                    )}
+
+                                    {/* BRANDS (JSON ARRAY) */}
+                                    {capabilities.brands?.length > 0 && (
+                                        <div>
+                                        <p className="font-semibold">Products Used:</p>
+                                        <ul className="list-disc ml-5">
+                                            {capabilities.brands.map((brand, index) => (
+                                            <li key={index}>{brand}</li>
+                                            ))}
+                                        </ul>
+                                        </div>
+                                    )}
+
+                                    {/* HYGIENE */}
+                                    {(capabilities.hygiene_brush_sanitised ||
+                                        capabilities.hygiene_disposable ||
+                                        capabilities.hygiene_sanitised_kit ||
+                                        capabilities.hygiene_fresh_sponges) && (
+                                        <div>
+                                        <p className="font-semibold">Hygiene Practices:</p>
+                                        <ul className="list-disc ml-5">
+
+                                            {capabilities.hygiene_brush_sanitised && (
+                                            <li>Brushes sanitised</li>
+                                            )}
+
+                                            {capabilities.hygiene_disposable && (
+                                            <li>Disposable applicators</li>
+                                            )}
+
+                                            {capabilities.hygiene_sanitised_kit && (
+                                            <li>Sanitised kit</li>
+                                            )}
+
+                                            {capabilities.hygiene_fresh_sponges && (
+                                            <li>Fresh sponges</li>
+                                            )}
+
+                                        </ul>
+                                        </div>
+                                    )}
+
+                                    {/* OUTSTATION */}
+                                    {capabilities.outstation_available !== null && (
+                                        <p>
+                                        Outstation Booking:{" "}
+                                        {capabilities.outstation_available ? "Available" : "Not Available"}
+                                        </p>
+                                    )}
+
+                                    {capabilities.outstation_conditions && (
+                                        <p>Outstation Conditions: {capabilities.outstation_conditions}</p>
+                                    )}
+
+                                    {/* ALLERGY */}
+                                    {capabilities.allergy_handling && (
+                                        <p>Allergy Handling: {capabilities.allergy_handling}</p>
+                                    )}
+
 
                                 </div>
 
+                                
                             )}
 
                         </Accordion>
@@ -268,24 +381,22 @@ return(
 
                         <div className="space-y-2">
 
-                        {availability.map((day) => (
-
-                            <div
-                            key={day.id}
-                            className="flex justify-between border-b py-2"
-                            >
-
-                            <span className="font-medium">
-                                {day.day_of_week}
-                            </span>
-
-                            <span>
-                                {day.start_time} - {day.end_time}
-                            </span>
-
+                                                    {[
+                            { label: "Monday", from: availability?.monday_from, to: availability?.monday_to },
+                            { label: "Tuesday", from: availability?.tuesday_from, to: availability?.tuesday_to },
+                            { label: "Wednesday", from: availability?.wednesday_from, to: availability?.wednesday_to },
+                            { label: "Thursday", from: availability?.thursday_from, to: availability?.thursday_to },
+                            { label: "Friday", from: availability?.friday_from, to: availability?.friday_to },
+                            { label: "Saturday", from: availability?.saturday_from, to: availability?.saturday_to },
+                            { label: "Sunday", from: availability?.sunday_from, to: availability?.sunday_to },
+                            ].map((day) => (
+                            <div key={day.label} className="flex justify-between border-b py-2">
+                                <span className="font-medium">{day.label}</span>
+                                <span>
+                                {day.from && day.to ? `${day.from} - ${day.to}` : "Not available"}
+                                </span>
                             </div>
-
-                        ))}
+                            ))}
 
                         </div>
 
@@ -356,9 +467,21 @@ return(
 
                                 <div className="space-y-2">
 
-                                <p>7+ days: {cancellation.refund_7_days}% refund</p>
-                                <p>48 hrs - 7 days: {cancellation.refund_48_to_7}% refund</p>
-                                <p>Within 48 hrs: {cancellation.refund_48}% refund</p>
+                                {cancellation?.cancel_7_days_percent != null && (
+                                <p>7+ days: {cancellation.cancel_7_days_percent}%</p>
+                                )}
+
+                                {cancellation?.cancel_48hr_7days_percent != null && (
+                                <p>48 hrs - 7 days: {cancellation.cancel_48hr_7days_percent}%</p>
+                                )}
+
+                                {cancellation?.cancel_within_48hr_percent != null && (
+                                <p>Within 48 hrs: {cancellation.cancel_within_48hr_percent}%</p>
+                                )}
+
+                                {cancellation?.no_show_percent != null && (
+                                <p>No show: {cancellation.no_show_percent}%</p>
+                                )}
 
                                 </div>
 

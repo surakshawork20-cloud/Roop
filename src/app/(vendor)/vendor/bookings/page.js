@@ -164,7 +164,7 @@ async function fetchBlockedDates(vendorId) {
 
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">Date</span>
-          <span>{b.booking_date}</span>
+          {new Date(b.booking_date).toLocaleDateString("en-GB")}
         </div>
 
         <div className="flex justify-between text-sm">
@@ -218,7 +218,7 @@ async function fetchBlockedDates(vendorId) {
       <tbody>
         {bookings.map((b) => (
           <tr key={b.id} className="border-t">
-            <td className="p-3">{b.booking_date}</td>
+            <td className="p-3">{new Date(b.booking_date).toLocaleDateString("en-GB")}</td>
 
             <td className="p-3">
               {b.start_time} - {b.end_time}

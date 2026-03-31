@@ -84,7 +84,7 @@ if (validServices.length === 0) {
 }
 
     for (const s of services) {
-      if (!s.service_group || !s.service_name || !s.price) {
+      if (!s.service_name || !s.price) {
         alert("Please fill required service fields");
         return;
       }

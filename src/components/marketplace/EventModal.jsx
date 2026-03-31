@@ -136,6 +136,7 @@ return (
         className="border p-2 w-full rounded"
       />
 
+      <label className="text-sm font-medium">Event Date</label>
       <input
         type="date"
         name="event_date"
@@ -146,10 +147,11 @@ return (
       />
 
 
+      <label className="text-sm font-medium">Event Date</label>
         <input
           type="time"
-          name="Event Time"
-          placeholder="Event Location"
+          name="event_time"
+          placeholder="Event Time"
           value={eventForm.event_time}
           onChange={handleEventChange}
           className="border p-2 w-full rounded"

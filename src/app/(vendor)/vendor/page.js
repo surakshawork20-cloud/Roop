@@ -1,7 +1,6 @@
 import { Calendar, DollarSign, CheckCircle, Clock } from "lucide-react";
 
 const stats = [
-  { title: "Total Earnings", value: "₹1,24,000", icon: DollarSign },
   { title: "Total Bookings", value: "320", icon: Calendar },
   { title: "Completed Bookings", value: "280", icon: CheckCircle },
   { title: "Upcoming Bookings", value: "40", icon: Clock },

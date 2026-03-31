@@ -126,6 +126,7 @@ async function createBooking() {
         {/* DATE + TIME GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
+          <label className="text-sm font-medium">Event Date</label>
         <input
           type="date"
           name="booking_date"
@@ -133,6 +134,7 @@ async function createBooking() {
           className="border p-2.5 w-full rounded-md text-sm"
         />
 
+        <label className="text-sm font-medium">Start Time</label>
         <input
           type="time"
           name="start_time"
@@ -140,12 +142,17 @@ async function createBooking() {
           className="border p-2.5 w-full rounded-md text-sm"
         />
 
+        <label className="text-sm font-medium">End Time</label>
         <input
           type="time"
           name="end_time"
           onChange={handleChange}
           className="border p-2.5 w-full rounded-md text-sm"
         />
+
+        <p className="text-xs text-gray-500 leading-relaxed">
+          * Your selected time slot will be fully blocked. Make sure to include travel, setup, and buffer time, as you won’t receive any other bookings during this period.
+        </p>
 
         <input
           name="event_time"
