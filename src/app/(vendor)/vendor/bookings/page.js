@@ -231,9 +231,11 @@ async function fetchBlockedDates(vendorId) {
             <td className="p-3">
               {b.customer_name}
               <br />
+              {/*}
               <span className="text-xs text-gray-500">
                 {b.customer_phone}
               </span>
+              */}
             </td>
 
             <td className="p-3">

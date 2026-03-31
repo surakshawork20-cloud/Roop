@@ -111,6 +111,7 @@ export default function ServiceCapabilities() {
         onChange={(v)=>update("experience_dark_skin",v==="Yes")}
       />
 
+{/*}
       {form.experience_dark_skin && (
         <Input
           label="Details"
@@ -118,6 +119,7 @@ export default function ServiceCapabilities() {
           onChange={(v)=>update("dark_skin_details",v)}
         />
       )}
+      */}
 
       {/* Artist Type */}
 

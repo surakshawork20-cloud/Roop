@@ -27,56 +27,57 @@ setEventForm({
 
 async function createEvent() {
 
+  const requiredFields = [
+    "name",
+    "event_name",
+    "phone",
+    "email",
+    "event_date",
+    "event_time",
+    "location"
+  ];
 
-const requiredFields = [
-  "name",
-  "event_name",
-  "phone",
-  "email",
-  "event_date",
-  "event_time",
-  "location"
-];
+  for (const field of requiredFields) {
+    if (!eventForm[field]) {
+      alert("Please fill all required fields");
+      return;
+    }
+  }
 
-for (const field of requiredFields) {
-  if (!eventForm[field]) {
-    alert("Please fill all required fields");
+  const { data: userData } = await supabase.auth.getUser();
+  const currentUser = userData.user;
+
+  // ✅ FIX TIME FORMAT
+  const formattedTime = eventForm.event_time + ":00";
+
+  const { error } = await supabase
+    .from("customer_events")
+    .insert({
+      user_id: currentUser.id,
+      ...eventForm,
+      event_time: formattedTime // override here
+    });
+
+  if (error) {
+    console.error(error);
+    alert("Error creating event");
     return;
   }
-}
 
-const { data: userData } = await supabase.auth.getUser();
-const currentUser = userData.user;
+  alert("Event created successfully");
 
-const { error } = await supabase
-  .from("customer_events")
-  .insert({
-    user_id: currentUser.id,
-    ...eventForm
+  setEventForm({
+    name: "",
+    event_name: "",
+    phone: "",
+    email: "",
+    event_date: "",
+    event_time: "",
+    location: "",
+    budget: ""
   });
 
-if (error) {
-  console.error(error);
-  alert("Error creating event");
-  return;
-}
-
-alert("Event created successfully");
-
-setEventForm({
-  name: "",
-  event_name: "",
-  phone: "",
-  email: "",
-  event_date: "",
-  event_time: "",
-  location: "",
-  budget: ""
-});
-
-close();
-
-
+  close();
 }
 
 if (!open) return null;
@@ -86,14 +87,13 @@ return (
 
 
 <div
-  className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-6"
+  className="fixed inset-0 z-[9999] bg-black/50 flex items-start justify-center overflow-y-auto p-4"
   onClick={close}
 >
   <div
     
     onClick={(e) => e.stopPropagation()}
   >
-  <div className="flex min-h-full items-start justify-center pt-24 pb-10 px-4">
 
     <div
       className="bg-white text-black rounded-xl w-full max-w-lg p-6 space-y-4 shadow-xl"
@@ -104,33 +104,33 @@ return (
         Create Event
       </h2>
 
+      <label className="text-sm font-medium">Your Name</label>
       <input
         name="name"
-        placeholder="Your Name"
         value={eventForm.name}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
       />
 
+      <label className="text-sm font-medium">Event Name (Wedding, Reception etc)</label>
       <input
         name="event_name"
-        placeholder="Event Name (Wedding, Reception etc)"
         value={eventForm.event_name}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
       />
 
+      <label className="text-sm font-medium">Phone Number</label>
       <input
         name="phone"
-        placeholder="Phone Number"
         value={eventForm.phone}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
       />
 
+      <label className="text-sm font-medium">Email</label>
       <input
         name="email"
-        placeholder="Email"
         value={eventForm.email}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
@@ -140,35 +140,33 @@ return (
       <input
         type="date"
         name="event_date"
-        placeholder="Event Date"
         value={eventForm.event_date}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
       />
 
 
-      <label className="text-sm font-medium">Event Date</label>
+      <label className="text-sm font-medium">Event Time</label>
         <input
           type="time"
           name="event_time"
-          placeholder="Event Time"
           value={eventForm.event_time}
           onChange={handleEventChange}
           className="border p-2 w-full rounded"
         />
 
 
+      <label className="text-sm font-medium">Event Location</label> 
       <input
         name="location"
-        placeholder="Event Location"
         value={eventForm.location}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
       />
 
+      <label className="text-sm font-medium">Budget (Optional)</label>
       <input
         name="budget"
-        placeholder="Budget (Optional)"
         value={eventForm.budget}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
@@ -196,7 +194,6 @@ return (
 
   </div>
 
-</div>
 </div>
 
 

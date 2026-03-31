@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import PortfolioCarousel from "@/components/marketplace/PortfolioCarousel";
 import ArtistCalendar from "@/components/marketplace/ArtistCalendar";
 import { Briefcase } from "lucide-react";
+import ReviewSection from "@/components/marketplace/ReviewSection";
 
 export default async function ArtistPage({ params }) {
 
@@ -146,6 +147,10 @@ const hasCapabilities =
     capabilities.hygiene_fresh_sponges
   );
 
+
+  const validCharges = charges?.filter(
+  (c) => c?.charge_type && c?.amount !== undefined && c?.amount !== null
+);
 return(
 
         <div>
@@ -223,21 +228,62 @@ return(
 
                                     <div>
 
-                                    <p className="font-semibold text-lg">
+                                    <p className="text-sm text-gray-500">
                                     {service.service_name}
                                     </p>
 
+                                        {/*
                                     <p className="text-sm text-gray-500">
                                     {service.service_group}
                                     </p>
+                                    */}
+
 
                                     </div>
 
-                                    <div className="text-lg font-bold">
+                                    <div className="text-sm text-gray-500">
                                     ₹ {service.price}
                                     </div>
+                                    {service.event_type && (
+                                    <p className="text-xs text-gray-500">
+                                        {service.event_type}
+                                    </p>
+                                    )}
 
+                                    {/* DURATION */}
+                                    {service.duration && (
+                                    <p className="text-xs text-gray-500">
+                                        Duration: {service.duration} hrs
+                                    </p>
+                                    )}
+
+                                    {/* INCLUSIONS */}
+                                    {service.inclusions && (
+                                    <div>
+                                        <p className="text-xs font-medium text-gray-700">
+                                        Includes:
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                        {service.inclusions}
+                                        </p>
                                     </div>
+                                    )}
+
+                                    {/* EXCLUSIONS */}
+                                    {service.exclusions && (
+                                    <div>
+                                        <p className="text-xs font-medium text-gray-700">
+                                        Excludes:
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                        {service.exclusions}
+                                        </p>
+                                    </div>
+                                    )}
+
+                                </div>
+
+                                    
 
                                     ))}
 
@@ -267,9 +313,26 @@ return(
 
                                     {/* EXPERTISE */}
                                     {capabilities.expertise && (
-                                        <p>Expertise: {capabilities.expertise}</p>
-                                    )}
+                                            <p>
+                                                Expertise: {
+                                                    (() => {
+                                                        const expertise = capabilities.expertise.toLowerCase();
 
+                                                        const mapped = [];
+
+                                                        if (expertise.includes("south indian")) {
+                                                            mapped.push("South Indian");
+                                                        }
+
+                                                        if (expertise.includes("indian") && !expertise.includes("south indian")) {
+                                                            mapped.push("North Indian");
+                                                        }
+
+                                                        return mapped.length ? mapped.join(", ") : capabilities.expertise;
+                                                    })()
+                                                }
+                                            </p>
+                                        )}
                                     {/* ARTIST TYPE + TEAM SIZE */}
                                     {capabilities.artist_type && (
                                         <p>
@@ -286,14 +349,16 @@ return(
                                     )}
 
                                     {/* LEAD TIME */}
+                                    {/*
                                     {capabilities.lead_time_hours && (
                                         <p>Minimum Booking Notice: {capabilities.lead_time_hours} hrs</p>
                                     )}
+                                        */}
 
                                     {/* DARK SKIN */}
                                     {capabilities.experience_dark_skin !== null && (
                                         <p>
-                                        Experience Working on Dark Skin:{" "}
+                                        Experience Working on Dusky Skin:{" "}
                                         {capabilities.experience_dark_skin ? "✔ Yes" : "✖ No"}
                                         </p>
                                     )}
@@ -369,7 +434,11 @@ return(
                         </Accordion>
 
 
+
+
                     {/* WEEKLY AVAILABILITY */}
+
+                    {/*
 
                     <Accordion title="Weekly Availability">
 
@@ -402,33 +471,21 @@ return(
 
                     )}
 
-                    </Accordion>
+                    </Accordion>  */}
 
             {/* ADDITIONAL CHARGES */}
 
-                        <Accordion title="Additional Charges">
-
-                            {charges?.length === 0 ? (
-
-                                <p className="text-gray-400">
-                                No additional charges
-                                </p>
-
-                                ) : (
-
+                        {validCharges?.length > 0 && (
+                            <Accordion title="Additional Charges">
                                 <div className="space-y-2">
-
-                                {charges.map((c)=>(
-                                <p key={c.id}>
-                                {c.charge_type} — ₹ {c.amount}
-                                </p>
+                                {validCharges.map((c) => (
+                                    <p key={c.id}>
+                                    {c.charge_type} — ₹ {c.amount}
+                                    </p>
                                 ))}
-
                                 </div>
-
+                            </Accordion>
                             )}
-
-                        </Accordion>
 
             {/* PAYMENT DETAILS */}
 
@@ -443,10 +500,13 @@ return(
                                 ) : (
 
                                 <div className="space-y-2">
+                                    {payments?.payment_structure && (
+                                        <p>Payment Structure: {payments.payment_structure}</p>
+                                    )}
 
-                                <p>Payment Structure: {payments.payment_structure}</p>
-                                <p>Accepted Modes: {payments.payment_modes}</p>
-
+                                    {payments?.payment_modes && (
+                                        <p>Accepted Modes: {payments.payment_modes}</p>
+                                    )}
                                 </div>
 
                             )}
@@ -488,6 +548,9 @@ return(
                             )}
 
                         </Accordion>
+
+
+                        <ReviewSection vendorId={vendorId} />
 
                 </div>
 
