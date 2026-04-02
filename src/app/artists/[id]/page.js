@@ -151,6 +151,13 @@ const hasCapabilities =
   const validCharges = charges?.filter(
   (c) => c?.charge_type && c?.amount !== undefined && c?.amount !== null
 );
+
+
+const paymentList = Array.isArray(payments)
+  ? payments
+  : payments
+  ? [payments]
+  : [];
 return(
 
         <div>
@@ -216,78 +223,51 @@ return(
                                     </p>
 
                                     ) : (
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            {services.map((service) => (
+                                                <div
+                                                key={service.id}
+                                                className="border rounded-xl p-4 shadow-sm hover:shadow-md transition bg-white"
+                                                >
+                                                {/* TOP ROW */}
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="text-base font-semibold text-gray-800">
+                                                    {service.service_name}
+                                                    </h3>
 
-                                    <div className="grid md:grid-cols-2 gap-4">
+                                                    <span className="text-sm font-semibold text-green-600">
+                                                    ₹ {service.price}
+                                                    </span>
+                                                </div>
 
-                                    {services.map((service)=>(
+                                                {/* META INFO */}
+                                                <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-2">
+                                                    {service.event_type && <span>{service.event_type}</span>}
+                                                    {service.duration && <span>⏱ {service.duration} mins</span>}
+                                                </div>
 
-                                    <div
-                                    key={service.id}
-                                    className="border rounded-lg p-5 flex justify-between items-center"
-                                    >
+                                                {/* INCLUSIONS */}
+                                                {service.inclusions && (
+                                                    <div className="mb-2">
+                                                    <p className="text-xs font-medium text-gray-700">Includes</p>
+                                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                                        {service.inclusions}
+                                                    </p>
+                                                    </div>
+                                                )}
 
-                                    <div>
-
-                                    <p className="text-sm text-gray-500">
-                                    {service.service_name}
-                                    </p>
-
-                                        {/*
-                                    <p className="text-sm text-gray-500">
-                                    {service.service_group}
-                                    </p>
-                                    */}
-
-
-                                    </div>
-
-                                    <div className="text-sm text-gray-500">
-                                    ₹ {service.price}
-                                    </div>
-                                    {service.event_type && (
-                                    <p className="text-xs text-gray-500">
-                                        {service.event_type}
-                                    </p>
-                                    )}
-
-                                    {/* DURATION */}
-                                    {service.duration && (
-                                    <p className="text-xs text-gray-500">
-                                        Duration: {service.duration} hrs
-                                    </p>
-                                    )}
-
-                                    {/* INCLUSIONS */}
-                                    {service.inclusions && (
-                                    <div>
-                                        <p className="text-xs font-medium text-gray-700">
-                                        Includes:
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                        {service.inclusions}
-                                        </p>
-                                    </div>
-                                    )}
-
-                                    {/* EXCLUSIONS */}
-                                    {service.exclusions && (
-                                    <div>
-                                        <p className="text-xs font-medium text-gray-700">
-                                        Excludes:
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                        {service.exclusions}
-                                        </p>
-                                    </div>
-                                    )}
-
-                                </div>
-
-                                    
-
-                                    ))}
-
-                                    </div>
+                                                {/* EXCLUSIONS */}
+                                                {service.exclusions && (
+                                                    <div>
+                                                    <p className="text-xs font-medium text-gray-700">Excludes</p>
+                                                    <p className="text-xs text-gray-500 leading-relaxed">
+                                                        {service.exclusions}
+                                                    </p>
+                                                    </div>
+                                                )}
+                                                </div>
+                                            ))}
+                                            </div>
 
                             )}
 
@@ -361,10 +341,6 @@ return(
                                         Experience Working on Dusky Skin:{" "}
                                         {capabilities.experience_dark_skin ? "✔ Yes" : "✖ No"}
                                         </p>
-                                    )}
-
-                                    {capabilities.dark_skin_details && (
-                                        <p>Details: {capabilities.dark_skin_details}</p>
                                     )}
 
                                     {/* BRANDS (JSON ARRAY) */}
@@ -477,12 +453,49 @@ return(
 
                         {validCharges?.length > 0 && (
                             <Accordion title="Additional Charges">
-                                <div className="space-y-2">
-                                {validCharges.map((c) => (
-                                    <p key={c.id}>
-                                    {c.charge_type} — ₹ {c.amount}
-                                    </p>
-                                ))}
+                                <div className="space-y-3">
+                                {validCharges
+                                    .filter((c) => c.amount || c.note) // ✅ skip empty rows
+                                    .map((c) => {
+                                    const feeLabel =
+                                        c.fee_type === "per_km"
+                                        ? "per km"
+                                        : c.fee_type === "fixed"
+                                        ? "fixed"
+                                        : "";
+
+                                    return (
+                                        <div
+                                        key={c.id}
+                                        className="border rounded-lg p-3 bg-gray-50"
+                                        >
+                                        {/* TOP LINE */}
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-sm font-medium text-gray-800">
+                                            {c.charge_type?.trim() || "Other Charges"}
+                                            </p>
+
+                                            {c.amount && (
+                                            <p className="text-sm font-semibold text-gray-700">
+                                                ₹ {c.amount}
+                                                {feeLabel && (
+                                                <span className="text-xs text-gray-500 ml-1">
+                                                    / {feeLabel}
+                                                </span>
+                                                )}
+                                            </p>
+                                            )}
+                                        </div>
+
+                                        {/* NOTE */}
+                                        {c.note && (
+                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                                            {c.note}
+                                            </p>
+                                        )}
+                                        </div>
+                                    );
+                                    })}
                                 </div>
                             </Accordion>
                             )}
@@ -490,64 +503,114 @@ return(
             {/* PAYMENT DETAILS */}
 
                         <Accordion title="Payment Details">
+                        {paymentList.length === 0 ? (
+                            <p className="text-gray-400">
+                            Payment information not available
+                            </p>
+                        ) : (
+                            <div className="space-y-4">
+                            {paymentList.map((p) => {
+                                const modes = [
+                                p.accept_upi && "UPI",
+                                p.accept_cash && "Cash",
+                                p.accept_bank_transfer && "Bank Transfer",
+                                ].filter(Boolean);
 
-                            {!payments ? (
+                                if (
+                                !p.payment_structure &&
+                                modes.length === 0 &&
+                                !p.notes &&
+                                p.provides_invoice === null
+                                ) {
+                                return null;
+                                }
 
-                                <p className="text-gray-400">
-                                Payment information not available
-                                </p>
-
-                                ) : (
-
-                                <div className="space-y-2">
-                                    {payments?.payment_structure && (
-                                        <p>Payment Structure: {payments.payment_structure}</p>
+                                return (
+                                <div key={p.id} className="border rounded-lg p-3 bg-gray-50">
+                                    {p.payment_structure && (
+                                    <p className="text-sm font-medium text-gray-800">
+                                        {p.payment_structure}
+                                    </p>
                                     )}
 
-                                    {payments?.payment_modes && (
-                                        <p>Accepted Modes: {payments.payment_modes}</p>
+                                    {modes.length > 0 && (
+                                    <p className="text-xs text-gray-600 mt-1">
+                                        Accepted: {modes.join(", ")}
+                                    </p>
+                                    )}
+
+                                    {p.provides_invoice !== null && (
+                                    <p className="text-xs text-gray-600 mt-1">
+                                        Invoice: {p.provides_invoice ? "Available" : "Will Not Be Provided"}
+                                    </p>
+                                    )}
+
+                                    {p.notes && (
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {p.notes}
+                                    </p>
                                     )}
                                 </div>
-
-                            )}
-
+                                );
+                            })}
+                            </div>
+                        )}
                         </Accordion>
 
             {/* CANCELLATION POLICY */}
 
-                        <Accordion title="Cancellation Policy">
-
+                       <Accordion title="Cancellation Policy">
                             {!cancellation ? (
-
                                 <p className="text-gray-400">
                                 Cancellation policy not set
                                 </p>
+                            ) : (
+                                <div className="space-y-2 text-sm text-gray-700">
 
+                                {/* 🚨 MAIN LOGIC */}
+                                {cancellation.no_refund_on_cancel ? (
+                                    <>
+                                    <p className="font-medium text-red-600">
+                                        No refund on cancellation
+                                    </p>
+
+                                    {cancellation.no_refund_notes && (
+                                        <p className="text-xs text-gray-500">
+                                        {cancellation.no_refund_notes}
+                                        </p>
+                                    )}
+                                    </>
                                 ) : (
+                                    <>
+                                    {cancellation.cancel_7_days_percent != null && (
+                                        <p>
+                                        7+ days: {cancellation.cancel_7_days_percent}% refund
+                                        </p>
+                                    )}
 
-                                <div className="space-y-2">
+                                    {cancellation.cancel_48hr_7days_percent != null && (
+                                        <p>
+                                        48 hrs – 7 days: {cancellation.cancel_48hr_7days_percent}% refund
+                                        </p>
+                                    )}
 
-                                {cancellation?.cancel_7_days_percent != null && (
-                                <p>7+ days: {cancellation.cancel_7_days_percent}%</p>
+                                    {/* Optional notes */}
+                                    {cancellation.cancel_7_days_notes && (
+                                        <p className="text-xs text-gray-500">
+                                        {cancellation.cancel_7_days_notes}
+                                        </p>
+                                    )}
+
+                                    {cancellation.cancel_48hr_7days_notes && (
+                                        <p className="text-xs text-gray-500">
+                                        {cancellation.cancel_48hr_7days_notes}
+                                        </p>
+                                    )}
+                                    </>
                                 )}
-
-                                {cancellation?.cancel_48hr_7days_percent != null && (
-                                <p>48 hrs - 7 days: {cancellation.cancel_48hr_7days_percent}%</p>
-                                )}
-
-                                {cancellation?.cancel_within_48hr_percent != null && (
-                                <p>Within 48 hrs: {cancellation.cancel_within_48hr_percent}%</p>
-                                )}
-
-                                {cancellation?.no_show_percent != null && (
-                                <p>No show: {cancellation.no_show_percent}%</p>
-                                )}
-
                                 </div>
-
                             )}
-
-                        </Accordion>
+                            </Accordion>
 
 
                         <ReviewSection vendorId={vendorId} />

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import EventModal from "./EventModal";
 
 export default function MyEventsModal({ open, close }) {
 
 const [events, setEvents] = useState([]);
-
+const [showEventModal, setShowEventModal] = useState(false);
 useEffect(() => {
 if (open) {
 fetchEvents();
@@ -134,7 +135,14 @@ return (
 
     ))}
 
-    <div className="flex justify-end pt-2">
+    <div className="flex justify-between pt-2">
+
+      <button
+        onClick={() => setShowEventModal(true)}
+        className="bg-[#691926] text-white px-3 py-1 rounded text-sm"
+      >
+        + Add Event
+      </button>
 
       <button
         onClick={close}
@@ -146,6 +154,14 @@ return (
     </div>
 
   </div>
+
+  <EventModal
+  open={showEventModal}
+  close={() => {
+    setShowEventModal(false);
+    fetchEvents();
+  }}
+/>
 
 </div>
 

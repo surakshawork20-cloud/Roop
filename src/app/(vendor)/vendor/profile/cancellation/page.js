@@ -4,20 +4,19 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function CancellationPolicyPage() {
-
   const [form, setForm] = useState({});
   const [userId, setUserId] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     init();
   }, []);
 
   async function init() {
-
     const { data } = await supabase.auth.getUser();
     const user = data.user;
 
@@ -40,33 +39,33 @@ export default function CancellationPolicyPage() {
     }
 
     setLoading(false);
-
   }
 
   function handleChange(e) {
-
     const { name, value } = e.target;
 
     setForm({
       ...form,
-      [name]: value
+      [name]: value,
     });
-
   }
 
   async function savePolicy() {
+    if (!userId) return;
+
+    setSaving(true);
 
     const { error } = await supabase
       .from("vendor_cancellation_policy")
       .upsert(
         {
           vendor_id: userId,
-          ...form
+          ...form,
         },
-        {
-          onConflict: "vendor_id"
-        }
+        { onConflict: "vendor_id" }
       );
+
+    setSaving(false);
 
     if (error) {
       console.error(error);
@@ -77,16 +76,16 @@ export default function CancellationPolicyPage() {
     setSaved(true);
     setEditing(false);
 
+    // optional UX feedback
+    alert("Policy saved successfully");
   }
 
   if (loading) return null;
 
   return (
-
     <div className="max-w-4xl">
-
-      <div className="flex flex-col sm:flex-row sm:justify-between pb-2 gap-1">
-
+      {/* HEADER */}
+      <div className="flex justify-between items-center pb-2">
         <h1 className="text-2xl font-semibold">
           Cancellation & Refund Policy
         </h1>
@@ -99,139 +98,190 @@ export default function CancellationPolicyPage() {
             Edit
           </button>
         )}
-
       </div>
 
+      {/* EDIT MODE */}
       {editing && (
+        <div className="space-y-6 pb-28">
 
-        <div className="space-y-6">
+          {/* 🚨 NO REFUND AT ANY TIME */}
+          <div className="border rounded-xl p-4 space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.no_refund_on_cancel || false}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    no_refund_on_cancel: e.target.checked,
+                    no_refund_within_48hr: false,
+                  })
+                }
+                className="mt-1"
+              />
 
-          <Scenario
-            label="Customer cancels 7+ days before event"
-            percentName="cancel_7_days_percent"
-            notesName="cancel_7_days_notes"
-            form={form}
-            handleChange={handleChange}
-          />
+              <div>
+                <p className="font-medium text-gray-800">
+                  No refund on cancellation
+                </p>
+                <p className="text-xs text-gray-500">
+                  Applies to all timeframes
+                </p>
+              </div>
+            </label>
 
-          <Scenario
-            label="Customer cancels 48 hrs – 7 days before event"
-            percentName="cancel_48hr_7days_percent"
-            notesName="cancel_48hr_7days_notes"
-            form={form}
-            handleChange={handleChange}
-          />
+            <input
+              name="no_refund_notes"
+              value={form.no_refund_notes || ""}
+              onChange={handleChange}
+              placeholder="Add notes (optional)"
+              className="border rounded-lg px-3 py-2 w-full text-sm"
+              disabled={!form.no_refund_on_cancel}
+            />
+          </div>
 
-          <Scenario
-            label="Customer cancels within 48 hrs of event"
-            percentName="cancel_within_48hr_percent"
-            notesName="cancel_within_48hr_notes"
-            form={form}
-            handleChange={handleChange}
-          />
+          {/* 🚨 NO REFUND WITHIN 48 HRS */}
+          <div className="border rounded-xl p-4 ">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.no_refund_within_48hr || false}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    no_refund_within_48hr: e.target.checked,
+                    no_refund_on_cancel: false,
+                  })
+                }
+                disabled={form.no_refund_on_cancel}
+                className="mt-1"
+              />
 
-          <Scenario
-            label="Customer no-show / last-minute refusal"
-            percentName="no_show_percent"
-            notesName="no_show_notes"
-            form={form}
-            handleChange={handleChange}
-          />
+              <div>
+                <p className="font-medium text-gray-800">
+                  No refund within 48 hrs
+                </p>
+                <p className="text-xs text-gray-500">
+                  Refunds allowed only before 48 hrs
+                </p>
+              </div>
+            </label>
+          </div>
 
-          <button
-            onClick={savePolicy}
-            className="bg-[#7A1820] text-white px-6 py-2 rounded-md w-full sm:w-auto"
+          {/* 🎯 PERCENTAGE RULES */}
+          <div
+            className={`space-y-4 ${
+              form.no_refund_on_cancel ? "opacity-50 pointer-events-none" : ""
+            }`}
           >
-            Save Policy
-          </button>
+            <Scenario
+              label="7+ days before event"
+              percentName="cancel_7_days_percent"
+              notesName="cancel_7_days_notes"
+              form={form}
+              handleChange={handleChange}
+            />
 
+            <Scenario
+              label="48 hrs – 7 days before event"
+              percentName="cancel_48hr_7days_percent"
+              notesName="cancel_48hr_7days_notes"
+              form={form}
+              handleChange={handleChange}
+            />
+          </div>
+
+          {/* ✅ SAVE BUTTON */}
+          <div className="pt-4">
+            <button
+              onClick={savePolicy}
+              disabled={saving}
+              className="bg-[#7A1820] text-white px-6 py-2 rounded disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save Policy"}
+            </button>
+          </div>
         </div>
-
       )}
 
+      {/* VIEW MODE */}
       {saved && !editing && (
-
         <div className="space-y-4">
 
-          <Row
-            label="7+ Days Before Event"
-            value={`${form.cancel_7_days_percent || 0}%`}
-          />
+          {form.no_refund_on_cancel ? (
+            <>
+              <Row
+                label="Cancellation Policy"
+                value="No refund on cancellation"
+              />
 
-          <Row
-            label="48 hrs – 7 Days"
-            value={`${form.cancel_48hr_7days_percent || 0}%`}
-          />
+              {form.no_refund_notes && (
+                <p className="text-xs text-gray-500">
+                  {form.no_refund_notes}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <Row
+                label="7+ Days Before Event"
+                value={`${form.cancel_7_days_percent || 0}% refund`}
+              />
 
-          <Row
-            label="Within 48 hrs"
-            value={`${form.cancel_within_48hr_percent || 0}%`}
-          />
-
-          <Row
-            label="No-show"
-            value={`${form.no_show_percent || 0}%`}
-          />
-
+              <Row
+                label="48 hrs – 7 Days"
+                value={`${form.cancel_48hr_7days_percent || 0}% refund`}
+              />
+            </>
+          )}
         </div>
-
       )}
-
     </div>
-
   );
-
 }
 
+/* COMPONENTS */
+
 function Scenario({ label, percentName, notesName, form, handleChange }) {
-
   return (
+    <div className="border rounded-xl p-4  space-y-3">
 
-    <div className="flex flex-col sm:grid sm:grid-cols-[260px_120px_1fr] gap-3 sm:gap-4 sm:items-center border sm:border-0 rounded p-3 sm:p-0">
-
-      <div className="text-gray-700">
+      <p className="text-sm font-medium text-gray-800">
         {label}
-      </div>
+      </p>
 
-      <input
-        type="number"
-        name={percentName}
-        value={form[percentName] || ""}
-        onChange={handleChange}
-        placeholder="%"
-        className="border rounded px-3 py-2 w-full sm:w-auto"
-      />
+      <div className="flex gap-2">
+        <input
+          type="number"
+          name={percentName}
+          value={form[percentName] || ""}
+          onChange={handleChange}
+          placeholder="%"
+          className="border rounded-lg px-3 py-2 w-24"
+        />
+
+        <span className="text-sm text-gray-500 self-center">
+          % refund
+        </span>
+      </div>
 
       <input
         name={notesName}
         value={form[notesName] || ""}
         onChange={handleChange}
-        placeholder="Notes"
-        className="border rounded px-3 py-2 w-full"
+        placeholder="Add notes (optional)"
+        className="border rounded-lg px-3 py-2 w-full text-sm"
       />
 
     </div>
-
   );
-
 }
 
 function Row({ label, value }) {
-
   return (
-
     <div className="flex justify-between border-b pb-2">
-
-      <span className="text-gray-700 text-sm sm:text-base font-medium">
-        {label}
-      </span>
-
-      <span>
-        {value}
-      </span>
-
+      <span className="text-gray-700 font-medium">{label}</span>
+      <span>{value}</span>
     </div>
-
   );
-
 }

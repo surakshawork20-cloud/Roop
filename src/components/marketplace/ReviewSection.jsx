@@ -14,16 +14,32 @@ export default function ReviewSection({ vendorId }) {
   FETCH REVIEWS
   -------------------------- */
 
-  async function fetchReviews() {
-    const { data } = await supabase
-      .from("vendor_reviews")
-      .select("*")
-      .eq("vendor_id", vendorId)
-      .order("created_at", { ascending: false });
+async function fetchReviews() {
+  const { data: reviews } = await supabase
+    .from("vendor_reviews")
+    .select("*")
+    .eq("vendor_id", vendorId)
+    .order("created_at", { ascending: false });
 
-    setReviews(data || []);
+  if (!reviews || reviews.length === 0) {
+    setReviews([]);
+    return;
   }
 
+  const userIds = reviews.map(r => r.user_id);
+
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .in("id", userIds);
+
+  const merged = reviews.map(r => ({
+    ...r,
+    email: profiles.find(p => p.id === r.user_id)?.email
+  }));
+
+  setReviews(merged);
+}
   useEffect(() => {
     if (vendorId) fetchReviews();
   }, [vendorId]);
@@ -86,7 +102,7 @@ async function handleAddReview() {
 
         {reviews.map((r) => {
 
-const username = r.users?.email?.split("@")[0] || "User";
+const username = r.email?.split("@")[0] || "User";
 
   return (
     <div

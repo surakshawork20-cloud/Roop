@@ -15,10 +15,30 @@ event_time: "",
 location: "",
 budget: ""
 });
-
+function isValidPhone(phone) {
+  return /^\+?[0-9]{10,15}$/.test(phone);
+}
 
 
 function handleEventChange(e) {
+
+  const { name, value } = e.target;
+
+  if (name === "phone") {
+    // allow only digits and +
+    let cleaned = value.replace(/[^\d+]/g, "");
+
+    // only one + at the start
+    if (cleaned.includes("+")) {
+      cleaned = "+" + cleaned.replace(/\+/g, "");
+    }
+
+    setEventForm((prev) => ({
+      ...prev,
+      phone: cleaned,
+    }));
+    return;
+  }
 setEventForm({
 ...eventForm,
 [e.target.name]: e.target.value
@@ -36,6 +56,12 @@ async function createEvent() {
     "event_time",
     "location"
   ];
+
+    // ✅ Validate phone BEFORE API call
+  if (!isValidPhone(eventForm.phone)) {
+    alert("Enter a valid phone number (10–15 digits)");
+    return;
+  }
 
   for (const field of requiredFields) {
     if (!eventForm[field]) {
@@ -104,7 +130,7 @@ return (
         Create Event
       </h2>
 
-      <label className="text-sm font-medium">Your Name</label>
+      <label className="text-sm font-medium">Your Name*</label>
       <input
         name="name"
         value={eventForm.name}
@@ -112,7 +138,7 @@ return (
         className="border p-2 w-full rounded"
       />
 
-      <label className="text-sm font-medium">Event Name (Wedding, Reception etc)</label>
+      <label className="text-sm font-medium">Event Name (Wedding, Reception etc)*</label>
       <input
         name="event_name"
         value={eventForm.event_name}
@@ -120,15 +146,18 @@ return (
         className="border p-2 w-full rounded"
       />
 
-      <label className="text-sm font-medium">Phone Number</label>
+      <label className="text-sm font-medium">Phone Number*</label>
       <input
         name="phone"
         value={eventForm.phone}
         onChange={handleEventChange}
         className="border p-2 w-full rounded"
+        inputMode="tel"
+        pattern="^\+?[0-9]{10,15}$"
+        placeholder="+91XXXXXXXXXX"
       />
 
-      <label className="text-sm font-medium">Email</label>
+      <label className="text-sm font-medium">Email*</label>
       <input
         name="email"
         value={eventForm.email}
@@ -136,7 +165,7 @@ return (
         className="border p-2 w-full rounded"
       />
 
-      <label className="text-sm font-medium">Event Date</label>
+      <label className="text-sm font-medium">Event Date*</label>
       <input
         type="date"
         name="event_date"
@@ -146,7 +175,7 @@ return (
       />
 
 
-      <label className="text-sm font-medium">Event Time</label>
+      <label className="text-sm font-medium">Event Time*</label>
         <input
           type="time"
           name="event_time"
@@ -156,7 +185,7 @@ return (
         />
 
 
-      <label className="text-sm font-medium">Event Location</label> 
+      <label className="text-sm font-medium">Event Location*</label> 
       <input
         name="location"
         value={eventForm.location}
