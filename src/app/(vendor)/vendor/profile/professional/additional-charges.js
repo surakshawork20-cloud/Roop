@@ -134,7 +134,7 @@ export default function AdditionalCharges() {
 
 
               <input
-                placeholder="description"
+                placeholder="Description"
                 value={c.description || ""}
                 onChange={(e) =>
                   updateCharge(i, "description", e.target.value)
