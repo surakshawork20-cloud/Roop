@@ -24,7 +24,7 @@ export default function ProfessionalDetailsPage() {
       {/* SECTION 1 */}
 
       <Section
-        title="Service Menu – Event: Marriage"
+        title="Service Menu"
         open={openSection === "services"}
         onClick={() => toggle("services")}
       >

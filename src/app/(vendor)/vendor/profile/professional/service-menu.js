@@ -29,7 +29,7 @@ export default function ServiceMenuMarriage() {
       .from("vendor_services")
       .select("*")
       .eq("vendor_id", user.id)
-      .eq("event_type", "marriage");
+
 
     if (rows && rows.length > 0) {
       setServices(rows);
@@ -96,11 +96,9 @@ if (validServices.length === 0) {
       .from("vendor_services")
       .delete()
       .eq("vendor_id", userId)
-      .eq("event_type", "marriage");
 
     const rows = services.map((s) => ({
   vendor_id: userId,
-  event_type: "marriage",
   service_name: s.service_name,
   price: Number(s.price),
   duration: s.duration ? Number(s.duration) : null,
@@ -209,7 +207,7 @@ if (validServices.length === 0) {
               <tr>
                 <th className="border p-2">Service *</th>
                 <th className="border p-2">Price *</th>
-                <th className="border p-2">Duration</th>
+                <th className="border p-2">Duration (mins)</th>
                 <th className="border p-2">Inclusions</th>
                 <th className="border p-2">Exclusions</th>
                 <th className="border p-2"></th>

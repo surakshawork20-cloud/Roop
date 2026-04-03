@@ -98,7 +98,7 @@ export default function ServiceCapabilities() {
       <RadioGroup
         label="Expertise"
         value={form.expertise}
-        options={["North Indian","South Indian","Both"]}
+        options={["North Indian","South Indian","North Indian & South Indian"]}
         onChange={(v)=>update("expertise",v)}
       />
 

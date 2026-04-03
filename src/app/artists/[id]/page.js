@@ -148,8 +148,10 @@ const hasCapabilities =
   );
 
 
-  const validCharges = charges?.filter(
-  (c) => c?.charge_type && c?.amount !== undefined && c?.amount !== null
+const validCharges = charges?.filter(
+  (c) =>
+    (c?.charge_type && c.charge_type.trim() !== "") ||
+    (c?.description && c.description.trim() !== "")
 );
 
 
@@ -451,54 +453,32 @@ return(
 
             {/* ADDITIONAL CHARGES */}
 
-                        {validCharges?.length > 0 && (
-                            <Accordion title="Additional Charges">
-                                <div className="space-y-3">
-                                {validCharges
-                                    .filter((c) => c.amount || c.note) // ✅ skip empty rows
-                                    .map((c) => {
-                                    const feeLabel =
-                                        c.fee_type === "per_km"
-                                        ? "per km"
-                                        : c.fee_type === "fixed"
-                                        ? "fixed"
-                                        : "";
+                    {validCharges?.length > 0 && (
+  <Accordion title="Additional Charges">
+    <div className="space-y-3">
+      {validCharges.map((c) => {
+        const desc = c.description;
 
-                                    return (
-                                        <div
-                                        key={c.id}
-                                        className="border rounded-lg p-3 bg-gray-50"
-                                        >
-                                        {/* TOP LINE */}
-                                        <div className="flex justify-between items-center">
-                                            <p className="text-sm font-medium text-gray-800">
-                                            {c.charge_type?.trim() || "Other Charges"}
-                                            </p>
+        return (
+          <div
+            key={c.id}
+            className="border rounded-lg p-3 bg-gray-50"
+          >
+            <p className="text-sm font-medium text-gray-800">
+              {c.charge_type?.trim() || "Other Charges"}
+            </p>
 
-                                            {c.amount && (
-                                            <p className="text-sm font-semibold text-gray-700">
-                                                ₹ {c.amount}
-                                                {feeLabel && (
-                                                <span className="text-xs text-gray-500 ml-1">
-                                                    / {feeLabel}
-                                                </span>
-                                                )}
-                                            </p>
-                                            )}
-                                        </div>
-
-                                        {/* NOTE */}
-                                        {c.note && (
-                                            <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                                            {c.note}
-                                            </p>
-                                        )}
-                                        </div>
-                                    );
-                                    })}
-                                </div>
-                            </Accordion>
-                            )}
+            {desc && desc.trim() !== "" && (
+              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                {desc}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </Accordion>   
+)}
 
             {/* PAYMENT DETAILS */}
 
@@ -560,57 +540,51 @@ return(
             {/* CANCELLATION POLICY */}
 
                        <Accordion title="Cancellation Policy">
-                            {!cancellation ? (
-                                <p className="text-gray-400">
-                                Cancellation policy not set
+                        {!cancellation ? (
+                            <p className="text-gray-400">
+                            Cancellation policy not set
+                            </p>
+                        ) : (
+                            <div className="space-y-2 text-sm text-gray-700">
+
+                            {/* 🚨 MAIN LOGIC */}
+                            {cancellation.no_refund_on_cancel ? (
+                                <>
+                                <p className="font-medium text-red-600">
+                                    No refund on cancellation
                                 </p>
+                                </>
                             ) : (
-                                <div className="space-y-2 text-sm text-gray-700">
-
-                                {/* 🚨 MAIN LOGIC */}
-                                {cancellation.no_refund_on_cancel ? (
-                                    <>
-                                    <p className="font-medium text-red-600">
-                                        No refund on cancellation
+                                <>
+                                {cancellation.cancel_7_days_percent != null && (
+                                    <p>
+                                    7+ days: {cancellation.cancel_7_days_percent}% refund
                                     </p>
-
-                                    {cancellation.no_refund_notes && (
-                                        <p className="text-xs text-gray-500">
-                                        {cancellation.no_refund_notes}
-                                        </p>
-                                    )}
-                                    </>
-                                ) : (
-                                    <>
-                                    {cancellation.cancel_7_days_percent != null && (
-                                        <p>
-                                        7+ days: {cancellation.cancel_7_days_percent}% refund
-                                        </p>
-                                    )}
-
-                                    {cancellation.cancel_48hr_7days_percent != null && (
-                                        <p>
-                                        48 hrs – 7 days: {cancellation.cancel_48hr_7days_percent}% refund
-                                        </p>
-                                    )}
-
-                                    {/* Optional notes */}
-                                    {cancellation.cancel_7_days_notes && (
-                                        <p className="text-xs text-gray-500">
-                                        {cancellation.cancel_7_days_notes}
-                                        </p>
-                                    )}
-
-                                    {cancellation.cancel_48hr_7days_notes && (
-                                        <p className="text-xs text-gray-500">
-                                        {cancellation.cancel_48hr_7days_notes}
-                                        </p>
-                                    )}
-                                    </>
                                 )}
-                                </div>
+
+                                {cancellation.cancel_48hr_7days_percent != null && (
+                                    <p>
+                                    48 hrs – 7 days: {cancellation.cancel_48hr_7days_percent}% refund
+                                    </p>
+                                )}
+
+                                {/* Optional notes */}
+                                {cancellation.cancel_7_days_notes && (
+                                    <p className="text-xs text-gray-500">
+                                    {cancellation.cancel_7_days_notes}
+                                    </p>
+                                )}
+
+                                {cancellation.cancel_48hr_7days_notes && (
+                                    <p className="text-xs text-gray-500">
+                                    {cancellation.cancel_48hr_7days_notes}
+                                    </p>
+                                )}
+                                </>
                             )}
-                            </Accordion>
+                            </div>
+                        )}
+                        </Accordion>
 
 
                         <ReviewSection vendorId={vendorId} />

@@ -39,8 +39,13 @@ export default function AdditionalCharges() {
       .eq("vendor_id", user.id);
 
     if (rows) {
-      setCharges(rows);
-    }
+  const normalized = rows.map((c) => ({
+    charge_type: c.charge_type || "",
+    description: c.description || "",
+  }));
+
+  setCharges(normalized);
+}
 
     setLoading(false);
   }
@@ -50,10 +55,7 @@ export default function AdditionalCharges() {
       ...charges,
       {
         charge_type: "",
-        fee_type: "",
-        amount: "",
-        note: "",
-        comments: "",
+        description: "",
       },
     ]);
   }
@@ -81,10 +83,7 @@ export default function AdditionalCharges() {
     const rows = charges.map((c) => ({
       vendor_id: userId,
       charge_type: c.charge_type,
-      fee_type: c.fee_type,
-      amount: c.amount ? Number(c.amount) : null,
-      note: c.note,
-      comments: c.comments,
+      description: c.description,
     }));
 
     if (rows.length > 0) {
@@ -93,7 +92,10 @@ export default function AdditionalCharges() {
         .insert(rows);
 
       if (error) {
-        console.error(error);
+        console.error("FULL ERROR:", JSON.stringify(error, null, 2));
+        console.error("MESSAGE:", error?.message);
+        console.error("DETAILS:", error?.details);
+        console.error("HINT:", error?.hint);
         alert("Error saving charges");
         setSaving(false);
         return;
@@ -119,51 +121,23 @@ export default function AdditionalCharges() {
 
               <input
                 placeholder="Charge Type"
-                value={c.charge_type}
+                value={c.charge_type || ""}
                 onChange={(e) =>
                   updateCharge(i, "charge_type", e.target.value)
                 }
                 className="w-full border rounded px-2 py-2"
               />
 
-              <select
-                value={c.fee_type}
-                onChange={(e) =>
-                  updateCharge(i, "fee_type", e.target.value)
-                }
-                className="w-full border rounded px-2 py-2"
-              >
-                <option value="">Fee Type</option>
-                <option value="fixed">Fixed</option>
-                <option value="per_km">Per km</option>
-                <option value="per_hour">Per hour</option>
-                <option value="other">Other</option>
-              </select>
+
+
+
+
 
               <input
-                type="number"
-                placeholder="Amount"
-                value={c.amount}
+                placeholder="description"
+                value={c.description || ""}
                 onChange={(e) =>
-                  updateCharge(i, "amount", e.target.value)
-                }
-                className="w-full border rounded px-2 py-2"
-              />
-
-              <input
-                placeholder="Note"
-                value={c.note}
-                onChange={(e) =>
-                  updateCharge(i, "note", e.target.value)
-                }
-                className="w-full border rounded px-2 py-2"
-              />
-
-              <input
-                placeholder="Comments"
-                value={c.comments}
-                onChange={(e) =>
-                  updateCharge(i, "comments", e.target.value)
+                  updateCharge(i, "description", e.target.value)
                 }
                 className="w-full border rounded px-2 py-2"
               />
@@ -185,10 +159,7 @@ export default function AdditionalCharges() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="border p-2">Charge Type</th>
-                <th className="border p-2">Fee Type</th>
-                <th className="border p-2">Amount</th>
-                <th className="border p-2">Note</th>
-                <th className="border p-2">Comments</th>
+                <th className="border p-2">Description</th>
                 <th className="border p-2"></th>
               </tr>
             </thead>
@@ -198,7 +169,7 @@ export default function AdditionalCharges() {
                 <tr key={i}>
                   <td className="border p-2">
                     <input
-                      value={c.charge_type}
+                      value={c.charge_type || ""}
                       onChange={(e) =>
                         updateCharge(i, "charge_type", e.target.value)
                       }
@@ -206,48 +177,13 @@ export default function AdditionalCharges() {
                     />
                   </td>
 
-                  <td className="border p-2">
-                    <select
-                      value={c.fee_type}
-                      onChange={(e) =>
-                        updateCharge(i, "fee_type", e.target.value)
-                      }
-                      className="w-full border rounded px-2 py-1"
-                    >
-                      <option value="">Select</option>
-                      <option value="fixed">Fixed</option>
-                      <option value="per_km">Per km</option>
-                      <option value="per_hour">Per hour</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </td>
+                  
 
                   <td className="border p-2">
                     <input
-                      type="number"
-                      value={c.amount}
+                      value={c.description || ""}
                       onChange={(e) =>
-                        updateCharge(i, "amount", e.target.value)
-                      }
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </td>
-
-                  <td className="border p-2">
-                    <input
-                      value={c.note}
-                      onChange={(e) =>
-                        updateCharge(i, "note", e.target.value)
-                      }
-                      className="w-full border rounded px-2 py-1"
-                    />
-                  </td>
-
-                  <td className="border p-2">
-                    <input
-                      value={c.comments}
-                      onChange={(e) =>
-                        updateCharge(i, "comments", e.target.value)
+                        updateCharge(i, "description", e.target.value)
                       }
                       className="w-full border rounded px-2 py-1"
                     />

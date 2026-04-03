@@ -98,11 +98,13 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   pathname={pathname}
                 />
 
+            {/*
                 <SidebarItem
                   href="/vendor/profile/availability"
                   label="Availability Setup"
                   pathname={pathname}
                 />
+            */}
 
                 <SidebarItem
                   href="/vendor/profile/payments"
