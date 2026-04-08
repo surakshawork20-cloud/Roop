@@ -226,50 +226,45 @@ return(
 
                                     ) : (
                                         <div className="grid md:grid-cols-2 gap-4">
-                                            {services.map((service) => (
-                                                <div
-                                                key={service.id}
-                                                className="border rounded-xl p-4 shadow-sm hover:shadow-md transition bg-white"
-                                                >
-                                                {/* TOP ROW */}
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h3 className="text-base font-semibold text-gray-800">
-                                                    {service.service_name}
+                                                {services.map((service) => (
+                                                    <div
+                                                    key={service.id}
+                                                    className="border-2 border-[#691926] rounded-2xl p-4 bg-[#faf7f5] shadow-sm hover:shadow-md transition"
+                                                    >
+                                                    {/* TITLE */}
+                                                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                                                        {service.service_name}
                                                     </h3>
 
-                                                    <span className="text-sm font-semibold text-green-600">
-                                                    ₹ {service.price}
-                                                    </span>
-                                                </div>
+                                                    {/* PRICE + DURATION */}
+                                                    <div className="flex items-center gap-3 text-gray-700 mb-2">
+                                                        <span className="text-xl font-semibold text-black">
+                                                        ₹{service.price / 1000}k
+                                                        </span>
 
-                                                {/* META INFO */}
-                                                <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-2">
-                                                    {service.event_type && <span>{service.event_type}</span>}
-                                                    {service.duration && <span>⏱ {service.duration} mins</span>}
-                                                </div>
-
-                                                {/* INCLUSIONS */}
-                                                {service.inclusions && (
-                                                    <div className="mb-2">
-                                                    <p className="text-xs font-medium text-gray-700">Includes</p>
-                                                    <p className="text-xs text-gray-500 leading-relaxed">
-                                                        {service.inclusions}
-                                                    </p>
+                                                        {service.duration && (
+                                                        <span className="text-sm text-gray-500">
+                                                            {service.duration} min
+                                                        </span>
+                                                        )}
                                                     </div>
-                                                )}
 
-                                                {/* EXCLUSIONS */}
-                                                {service.exclusions && (
-                                                    <div>
-                                                    <p className="text-xs font-medium text-gray-700">Excludes</p>
-                                                    <p className="text-xs text-gray-500 leading-relaxed">
-                                                        {service.exclusions}
-                                                    </p>
+                                                    {/* INCLUSIONS */}
+                                                    {service.inclusions && (
+                                                        <p className="text-sm text-green-700">
+                                                        + {service.inclusions}
+                                                        </p>
+                                                    )}
+
+                                                    {/* EXCLUSIONS */}
+                                                    {service.exclusions && (
+                                                        <p className="text-sm text-red-500">
+                                                        − {service.exclusions}
+                                                        </p>
+                                                    )}
                                                     </div>
-                                                )}
+                                                ))}
                                                 </div>
-                                            ))}
-                                            </div>
 
                             )}
 
