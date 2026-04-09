@@ -225,46 +225,46 @@ return(
                                     </p>
 
                                     ) : (
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                                {services.map((service) => (
-                                                    <div
-                                                    key={service.id}
-                                                    className="border-2 border-[#691926] rounded-2xl p-4 bg-[#faf7f5] shadow-sm hover:shadow-md transition"
-                                                    >
-                                                    {/* TITLE */}
-                                                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                                                        {service.service_name}
-                                                    </h3>
+                                        <div className="grid md:grid-cols-2 gap-3">
+  {services.map((service) => (
+    <div
+      key={service.id}
+      className="border border-[#691926] rounded-xl p-3 bg-[#faf7f5] shadow-sm hover:shadow-md transition"
+    >
+      {/* TITLE + PRICE */}
+      <div className="flex justify-between items-center mb-1">
+        <h3 className="font-semibold text-gray-800">
+          {service.service_name}
+        </h3>
 
-                                                    {/* PRICE + DURATION */}
-                                                    <div className="flex items-center gap-3 text-gray-700 mb-2">
-                                                        <span className="text-xl font-semibold text-black">
-                                                        ₹{service.price / 1000}k
-                                                        </span>
+        <span className="font-semibold text-black">
+          ₹{service.price / 1000}k
+        </span>
+      </div>
 
-                                                        {service.duration && (
-                                                        <span className="text-sm text-gray-500">
-                                                            {service.duration} min
-                                                        </span>
-                                                        )}
-                                                    </div>
+      {/* DURATION */}
+      {service.duration && (
+        <p className="text-gray-600">
+          ⏰ {service.duration} min
+        </p>
+      )}
 
-                                                    {/* INCLUSIONS */}
-                                                    {service.inclusions && (
-                                                        <p className="text-sm text-green-700">
-                                                        + {service.inclusions}
-                                                        </p>
-                                                    )}
+      {/* INCLUSIONS */}
+      {service.inclusions && (
+        <p className="text-green-700">
+          + {service.inclusions}
+        </p>
+      )}
 
-                                                    {/* EXCLUSIONS */}
-                                                    {service.exclusions && (
-                                                        <p className="text-sm text-red-500">
-                                                        − {service.exclusions}
-                                                        </p>
-                                                    )}
-                                                    </div>
-                                                ))}
-                                                </div>
+      {/* EXCLUSIONS */}
+      {service.exclusions && (
+        <p className="text-red-500">
+          − {service.exclusions}
+        </p>
+      )}
+    </div>
+  ))}
+</div>
 
                             )}
 
