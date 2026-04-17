@@ -12,6 +12,7 @@ export default function VendorBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [rejectBooking, setRejectBooking] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   /* --------------------------
   FETCH BOOKINGS
@@ -74,7 +75,10 @@ export default function VendorBookingsPage() {
 
     const { error } = await supabase
       .from("booking_requests")
-      .update({ status })
+      .update({
+      status,
+      rejection_reason: reason
+    })
       .eq("id", id);
 
     if (error) {
@@ -218,19 +222,49 @@ export default function VendorBookingsPage() {
 
                 )}
                 {rejectBooking && (
-                    <AlertModal
-                        title="Reject Booking?"
-                        description="This action cannot be undone."
-                        confirmText="Yes, Reject"
-                        cancelText="Cancel"
-                        type="danger"
-                        onClose={() => setRejectBooking(null)}
-                        onConfirm={() => {
-                        updateStatus(rejectBooking.id, "rejected");
-                        setRejectBooking(null);
-                        }}
-                    />
-                    )}
+                  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4">
+
+                      <h2 className="text-lg font-semibold">Reject Booking</h2>
+
+                      <p className="text-sm text-gray-500">
+                        Please provide a reason for rejection
+                      </p>
+
+                      <textarea
+                        value={rejectionReason}
+                        onChange={(e) => setRejectionReason(e.target.value)}
+                        placeholder="Enter reason..."
+                        className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                        rows={4}
+                      />
+
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setRejectBooking(null);
+                            setRejectionReason("");
+                          }}
+                          className="px-4 py-2 text-sm border rounded-lg"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            updateStatus(rejectBooking.id, "rejected", rejectionReason);
+                            setRejectBooking(null);
+                            setRejectionReason("");
+                          }}
+                          className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg"
+                        >
+                          Reject
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                )}
     </div>
 
   );

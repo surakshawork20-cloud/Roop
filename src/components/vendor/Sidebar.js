@@ -85,12 +85,12 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   label="Basic Information"
                   pathname={pathname}
                 />
-
+                {/*}
                 <SidebarItem
                   href="/vendor/profile/verification"
                   label="Verification & Payout"
                   pathname={pathname}
-                />
+                />*/}
 
                 <SidebarItem
                   href="/vendor/profile/professional"

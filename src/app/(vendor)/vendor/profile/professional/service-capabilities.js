@@ -215,7 +215,7 @@ export default function ServiceCapabilities() {
 
       <Input label="Maximum bookings per day" value={form.max_bookings} onChange={(v)=>update("max_bookings",v)} />
 
-      <Input label="Minimum booking notice (hours)" value={form.lead_time_hours} onChange={(v)=>update("lead_time_hours",v)} />
+      {/*<Input label="Minimum booking notice (hours)" value={form.lead_time_hours} onChange={(v)=>update("lead_time_hours",v)} />*/}
 
       {/* Outstation */}
 

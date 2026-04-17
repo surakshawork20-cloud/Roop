@@ -86,33 +86,42 @@ Send Booking Request
 -------------------------- */
 
 async function sendBookingRequest(eventId) {
+  const { data: userData } = await supabase.auth.getUser();
+  const currentUser = userData.user;
 
+  console.log("USER:", currentUser);
 
-const { data: userData } = await supabase.auth.getUser();
-const currentUser = userData.user;
+  if (!currentUser) {
+    alert("User not logged in");
+    return;
+  }
 
-const { error } = await supabase
-  .from("booking_requests")
-  .insert({
+  const payload = {
     customer_id: currentUser.id,
     vendor_id: vendorId,
     event_id: eventId
-  });
+  };
 
-if (error) {
-  console.error(error);
-  alert("Error sending booking request");
-  return;
-}
+  console.log("PAYLOAD:", payload);
 
-alert("Booking request sent");
+  const { data, error, status } = await supabase
+    .from("booking_requests")
+    .insert(payload)
+    .select();
 
-setExistingBookings([
-  ...existingBookings,
-  { event_id: eventId }
-]);
+  console.log("INSERT RESULT:", { data, error, status });
 
+  if (error) {
+    alert(error.message || "Insert failed");
+    return;
+  }
 
+  alert("Booking request sent");
+
+  setExistingBookings([
+    ...existingBookings,
+    { event_id: eventId }
+  ]);
 }
 
 return (

@@ -190,8 +190,8 @@ export default function BasicProfilePage() {
                 <input
                   type="radio"
                   name="service_mode"
-                  value="travels"
-                  checked={form.service_mode === "travels"}
+                  value="Travels to client"
+                  checked={form.service_mode === "Travels to client"}
                   onChange={handleChange}
                   className="accent-[#7A1820]"
                 />
@@ -202,7 +202,7 @@ export default function BasicProfilePage() {
                 <input
                   type="radio"
                   name="service_mode"
-                  value="studio"
+                  value="In-studio"
                   checked={form.service_mode === "studio"}
                   onChange={handleChange}
                   className="accent-[#7A1820]"
@@ -219,7 +219,7 @@ export default function BasicProfilePage() {
                   onChange={handleChange}
                   className="accent-[#7A1820]"
                 />
-                Both
+                Travels to client & In-studio
               </label>
 
             </div>
