@@ -204,26 +204,27 @@ return(
                                 <p><strong className="text-[#691926]">Name:</strong> <span className="text-black">{basic.full_name || "-"}</span></p>
                                 <p><strong className="text-[#691926]">City:</strong> <span className="text-black">{basic.city || "-"}</span></p>
                                 <p><strong className="text-[#691926]">Area:</strong> <span className="text-black">{basic.area || "-"}</span></p>
-                                <p><strong className="text-[#691926]">Service Mode:</strong> <span className="text-black">{basic.service_mode || "-"}</span></p>
                                 <p><strong className="text-[#691926]">Travel Radius:</strong> <span className="text-black">{basic.travel_radius || "-"} km</span></p>
                                 <p><strong className="text-[#691926]">Languages:</strong> <span className="text-black">{basic.languages || "-"}</span></p>
                                 <p>
                                 <strong className="text-[#691926]">Service Mode:</strong>{" "}
                                 <span className="text-black">
                                     {(() => {
-                                    const mode = basic.service_mode?.toLowerCase() || "";
+                                    const mode = (basic.service_mode || "").toLowerCase();
 
-                                    const mapped = [];
-
-                                    if (mode.includes("travel")) {
-                                        mapped.push("Travels to client");
+                                    if (mode === "both") {
+                                        return "In-studio & Travels to client";
                                     }
 
-                                    if (mode.includes("studio")) {
-                                        mapped.push("In-studio");
+                                    if (mode === "travels to client") {
+                                        return "Travels to client";
                                     }
 
-                                    return mapped.length ? mapped.join(", ") : basic.service_mode || "-";
+                                    if (mode === "in-studio") {
+                                        return "In-studio";
+                                    }
+
+                                    return basic.service_mode || "-";
                                     })()}
                                 </span>
                                 </p>
@@ -546,22 +547,25 @@ return(
                                     )}
 
                                     {modes.length > 0 && (
-                                    <p className="text-xs text-black mt-1">
-                                        Accepted: {modes.join(", ")}
-                                    </p>
-                                    )}
+                                        <p>
+                                            <strong className="text-[#691926]">Accepted: </strong>
+                                            {modes.join(", ")}
+                                        </p>
+                                        )}
 
                                     {p.provides_invoice !== null && (
-                                    <p className="text-xs text-black mt-1">
-                                        Invoice: {p.provides_invoice ? "Available" : "Will Not Be Provided"}
-                                    </p>
-                                    )}
+                                        <p className=" mt-1">
+                                            <strong className="text-[#691926]">Invoice: </strong>
+                                            {p.provides_invoice ? "Available" : "Will Not Be Provided"}
+                                        </p>
+                                        )}
 
-                                    {p.notes && (
-                                    <p className="text-xs text-black mt-1">
-                                        {p.notes}
-                                    </p>
-                                    )}
+                                        {p.notes && (
+                                        <p className=" mt-1">
+                                            <strong className="text-[#691926]">Note: </strong>
+                                            {p.notes}
+                                        </p>
+                                        )}
                                 </div>
                                 );
                             })}

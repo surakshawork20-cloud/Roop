@@ -113,22 +113,19 @@ return (
 
 
 <div
-  className="fixed inset-0 z-[9999] bg-black/50 flex items-start justify-center overflow-y-auto p-4"
+  className="fixed inset-0 z-[9999] bg-black/50 overflow-y-auto"
   onClick={close}
 >
+  <div className="min-h-full flex justify-center items-start p-4">
   <div
-    
+    className="bg-white text-black rounded-xl w-full max-w-lg p-6 space-y-4 shadow-xl"
     onClick={(e) => e.stopPropagation()}
   >
 
-    <div
-      className="bg-white text-black rounded-xl w-full max-w-lg p-6 space-y-4 shadow-xl"
-      onClick={(e) => e.stopPropagation()}
-    >
-
-      <h2 className="text-xl font-semibold">
-        Create Event
-      </h2>
+   <div className="border-b pb-3">
+        <h2 className="text-xl font-semibold">Create Event</h2>
+      </div>
+     <div className="space-y-4">
 
       <label className="text-sm font-medium">Your Name*</label>
       <input
@@ -219,6 +216,7 @@ return (
 
       </div>
 
+    </div>
     </div>
 
   </div>

@@ -9,9 +9,16 @@ export default function MyEventsModal({ open, close }) {
 const [events, setEvents] = useState([]);
 const [showEventModal, setShowEventModal] = useState(false);
 useEffect(() => {
-if (open) {
-fetchEvents();
-}
+  if (open) {
+    document.body.style.overflow = "hidden";
+    fetchEvents();
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
 }, [open]);
 
 async function fetchEvents() {
@@ -84,21 +91,20 @@ function formatTime(time) {
 
 return (
 
-
-<div
-  className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-6"
-  onClick={close}
->
-
   <div
-    className="bg-white text-black rounded-xl w-full max-w-lg p-6 space-y-4 shadow-xl"
-    onClick={(e) => e.stopPropagation()}
+    className="fixed inset-0 z-[9999] bg-black/50 flex justify-center items-center"
+    onClick={close}
   >
+    <div
+      className="bg-white text-black rounded-xl w-full max-w-lg shadow-xl flex flex-col max-h-[80vh]"
+      onClick={(e) => e.stopPropagation()}
+    >
 
-    <h2 className="text-xl font-semibold">
-      My Events
-    </h2>
+    <div className="p-4 border-b">
+    <h2 className="text-xl font-semibold">My Events</h2>
+    </div>
 
+     <div className="flex-1 overflow-y-auto p-4 space-y-2">
     {events.length === 0 && (
       <p className="text-sm text-gray-500">
         No events created yet.
@@ -134,12 +140,13 @@ return (
       </div>
 
     ))}
+    </div>
 
-    <div className="flex justify-between pt-2">
+    <div className="border-t px-4 py-4 flex justify-between items-center">
 
       <button
         onClick={() => setShowEventModal(true)}
-        className="bg-[#691926] text-white px-3 py-1 rounded text-sm"
+        className="bg-[#691926] text-white px-3 py-2 rounded text-sm"
       >
         + Add Event
       </button>
@@ -164,7 +171,6 @@ return (
 />
 
 </div>
-
 
 );
 }
